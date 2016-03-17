@@ -23,7 +23,6 @@ public enum  AccessManager {
 
     public void signUp(User user) {
         signIn(user.getCredentials());
-        int i =0;
     }
 
     public void signIn(Credentials credentials) {
