@@ -12,7 +12,7 @@ import hgyw.com.bookshare.entities.Entity;
 public interface Backend {
 
     void createEntity(Entity entity);
-    Entity readEntity(Entity entity);
+    Entity readEntity(Class<? extends Entity> entityType, long entityId);
     void updateEntity(Entity entity);
     void deleteEntity(Entity entity);
 
