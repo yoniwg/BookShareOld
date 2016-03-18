@@ -12,9 +12,8 @@ import hgyw.com.bookshare.entities.Entity;
 public interface Backend {
 
     void createEntity(Entity entity);
-    Entity readEntity(Class<? extends Entity> entityType, long entityId);
     void updateEntity(Entity entity);
     void deleteEntity(Entity entity);
 
-    Stream<Entity> getStreamOf(Class<? extends Entity> entityType);
+    Stream<Entity> getStream(Class<? extends Entity> entityType);
 }

@@ -19,7 +19,7 @@ public class BackendFactory {
         if (backend == null) {
             switch (currentDB) {
                 case LISTS:
-                    backend = new ListsBackendImpl();
+                    backend = ListsBackendImpl.INSTANCE;
             }
         }
         return backend;

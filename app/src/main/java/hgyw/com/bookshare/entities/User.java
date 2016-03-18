@@ -1,12 +1,20 @@
 package hgyw.com.bookshare.entities;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.sql.Date;
 
 /**
  * Created by Yoni on 3/15/2016.
  */
-public class User extends Entity {
+public abstract class User extends Entity {
 
     private Credentials credentials;
     private String email;
@@ -15,7 +23,7 @@ public class User extends Entity {
     private String firstName;
     private String lastName;
     private Date birthday;
-    private long imageId;
+    private Bitmap image;
 
     public Credentials getCredentials() {
         return credentials;
@@ -71,5 +79,13 @@ public class User extends Entity {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
+    }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
     }
 }

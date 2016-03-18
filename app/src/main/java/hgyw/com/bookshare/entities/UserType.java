@@ -9,7 +9,7 @@ public enum UserType{
 
     CUSTOMER(Customer.class),
     SUPPLIER(Supplier.class),
-    GUEST(User.class);
+    GUEST(Guest.class);
 
     Class<?> clazz;
 

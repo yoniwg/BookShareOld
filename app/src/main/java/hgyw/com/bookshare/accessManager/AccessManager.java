@@ -1,13 +1,14 @@
 package hgyw.com.bookshare.accessManager;
 
 import hgyw.com.bookshare.entities.Credentials;
+import hgyw.com.bookshare.entities.Guest;
 import hgyw.com.bookshare.entities.User;
 import hgyw.com.bookshare.entities.UserType;
 
 /**
  * Created by Yoni on 3/13/2016.
  */
-public enum  AccessManager {
+public enum  AccessManager{
 
     INSTANCE;
 
@@ -16,8 +17,8 @@ public enum  AccessManager {
     private UserType userType;
 
     AccessManager() {
-        currentUser = new User();
-        swichAccess();
+        currentUser = new Guest();
+        switchAccess();
     }
 
 
@@ -26,10 +27,10 @@ public enum  AccessManager {
     }
 
     public void signIn(Credentials credentials) {
-        swichAccess();
+        switchAccess();
     }
 
-    private void swichAccess() {
+    private void switchAccess() {
         switch (UserType.ofClass(currentUser.getClass())) {
             case GUEST:
                 currentAccess = new GeneralAccessImpl(currentUser);
@@ -46,7 +47,7 @@ public enum  AccessManager {
 
     public void signOut() {
         currentUser = null;
-        swichAccess();
+        switchAccess();
     }
 
     public GeneralAccess getGeneralAccess() {

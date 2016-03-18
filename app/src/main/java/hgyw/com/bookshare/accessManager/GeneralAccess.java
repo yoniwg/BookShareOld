@@ -22,7 +22,6 @@ public interface GeneralAccess {
     List<Book> findBooks(BookQuery query);
     List<Book> findSpecialOffers(BookQuery query);
     List<BookReview> getBookReviews(Book book);
-    URL getImageById(long imageId);
 
     User getUser();
 
