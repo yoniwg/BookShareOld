@@ -36,10 +36,10 @@ public enum  AccessManager{
                 currentAccess = new GeneralAccessImpl(currentUser);
                 break;
             case CUSTOMER:
-                currentAccess = new CustomerAccessImpl(currentUser);
+                //currentAccess = new CustomerAccessImpl(currentUser);
                 break;
             case SUPPLIER:
-                currentAccess = new SupplierAccessImpl(currentUser);
+                //currentAccess = new SupplierAccessImpl(currentUser);
                 break;
         }
 
