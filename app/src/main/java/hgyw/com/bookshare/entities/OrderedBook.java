@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class OrderedBook {
     private Book book;
     private int amount;
-    private BigDecimal price;
+    private BigDecimal unitPrice;
 
     public Book getBook() {
         return book;
@@ -26,11 +26,15 @@ public class OrderedBook {
         this.amount = amount;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public BigDecimal calcTotalPrice() {
+        return getUnitPrice().multiply(BigDecimal.valueOf(getAmount()));
     }
 }
