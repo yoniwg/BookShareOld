@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.sql.Blob;
 import java.sql.Date;
 
 /**
@@ -88,4 +89,5 @@ public abstract class User extends Entity {
     public void setImage(Bitmap image) {
         this.image = image;
     }
+
 }

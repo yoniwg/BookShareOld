@@ -2,8 +2,6 @@ package hgyw.com.bookshare.backend;
 
 import com.annimon.stream.Stream;
 
-import java.util.List;
-
 import hgyw.com.bookshare.entities.Entity;
 
 /**
@@ -15,5 +13,5 @@ public interface Backend {
     void updateEntity(Entity entity);
     void deleteEntity(Entity entity);
 
-    Stream<Entity> getStream(Class<? extends Entity> entityType);
+    <T extends Entity> Stream<T> getStream(Class<T> entityType);
 }

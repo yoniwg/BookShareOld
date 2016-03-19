@@ -20,6 +20,13 @@ public class BackendFactory {
             switch (currentDB) {
                 case LISTS:
                     backend = ListsBackendImpl.INSTANCE;
+                    break;
+                case SQL_LITE:
+                    //TODO
+                    break;
+                case MY_SQL:
+                    //TODO
+                    break;
             }
         }
         return backend;

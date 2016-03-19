@@ -1,5 +1,7 @@
 package hgyw.com.bookshare.accessManager;
 
+import com.annimon.stream.Collectors;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +12,7 @@ import hgyw.com.bookshare.backend.BackendFactory;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
+import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.User;
 
 /**
@@ -24,7 +27,7 @@ public class GeneralAccessImpl implements GeneralAccess {
 
     @Override
     public List<Book> findBooks(BookQuery query) {
-        return Arrays.asList((Book[]) backend.getStream(Book.class).filter(query).toArray());
+        return backend.getStream(BookSupplier.class).map(e -> (BookSupplier) e).filter(query).map(e -> e.getBook()).collect(Collectors.toList());
     }
 
     @Override
