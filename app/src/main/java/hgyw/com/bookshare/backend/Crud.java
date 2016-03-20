@@ -8,7 +8,7 @@ import hgyw.com.bookshare.entities.Entity;
 /**
  * Created by Yoni on 3/17/2016.
  */
-public interface Backend {
+public interface Crud {
 
     void createEntity(Entity entity);
     void updateEntity(Entity entity);

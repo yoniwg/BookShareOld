@@ -3,23 +3,23 @@ package hgyw.com.bookshare.backend;
 /**
  * Created by Yoni on 3/17/2016.
  */
-public class BackendFactory {
+public class CrudFactory {
 
     private enum DatabaseType { LISTS, SQL_LITE ,MY_SQL}
 
     private static DatabaseType currentDB = DatabaseType.LISTS;
 
-    private static Backend backend;
+    private static Crud crud;
 
 
     /**
      * @return
      */
-    static public Backend getInstance(){
-        if (backend == null) {
+    static public Crud getInstance(){
+        if (crud == null) {
             switch (currentDB) {
                 case LISTS:
-                    backend = ListsBackendImpl.INSTANCE;
+                    crud = ListsCrudImpl.INSTANCE;
                     break;
                 case SQL_LITE:
                     //TODO
@@ -29,6 +29,6 @@ public class BackendFactory {
                     break;
             }
         }
-        return backend;
+        return crud;
     }
 }

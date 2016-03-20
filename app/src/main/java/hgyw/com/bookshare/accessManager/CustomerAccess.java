@@ -25,7 +25,6 @@ public interface CustomerAccess extends GeneralAccess {
     void performNewOrder(Order order);
     void cancelOrder(Order order);
     void updateOrderResponse(Order order);
-    void addBookReview(BookReview bookReview);
     void updateBookReview(BookReview bookReview);
     void removeBookReview(BookReview bookReview);
 

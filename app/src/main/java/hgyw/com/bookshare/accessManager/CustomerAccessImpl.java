@@ -1,12 +1,12 @@
 package hgyw.com.bookshare.accessManager;
 
 import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 
 import java.util.Date;
 import java.util.List;
 
 import hgyw.com.bookshare.entities.Book;
-import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Customer;
@@ -25,36 +25,42 @@ public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAcc
 
     @Override
     public Customer retrieveCustomerDetails() {
-        return getBackend().retrieveEntity(Customer.class, getUser().getId());
+        return getCrud().retrieveEntity(Customer.class, currentUser.getId());
     }
 
     @Override
     public void updateCustomerDetails(Customer newDetails) {
-        getBackend().updateEntity(newDetails);
+        if (newDetails.getId() != currentUser.getId())
+            throw new IllegalArgumentException("The ID is not compatible with the current user");
+        getCrud().updateEntity(newDetails);
     }
 
     @Override
     public List<BookReview> getCustomerReviews() {
-        return getBackend().getStream(BookReview.class)
-                .filter(r -> r.getReviewer().equals(getUser()))
+        return getCrud().getStream(BookReview.class)
+                .filter(r -> r.getReviewer().equals(currentUser))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Customer> findInterestedInBook(Book book) {
-        return null;
+        return getCrud().getStream(Order.class)
+                .filter(o -> Stream.of(o.getBooksList())
+                        .anyMatch(ob -> ob.getBook().equals(book)))
+                .map(Order::getCustomer)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Order> retrieveOrders(Date fromDate, Date toDate) {
-        return getBackend().getStream(Order.class)
+        return getCrud().getStream(Order.class)
                 .filter(o -> o.getDate().compareTo(fromDate) >= 0 && o.getDate().compareTo(toDate) <= 0)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Order> retrieveOpenOrders() {
-        return getBackend().getStream(Order.class)
+        return getCrud().getStream(Order.class)
                 .filter(Order::isOpen)
                 .collect(Collectors.toList());
     }
@@ -75,11 +81,6 @@ public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAcc
     }
 
     @Override
-    public void addBookReview(BookReview bookReview) {
-
-    }
-
-    @Override
     public void updateBookReview(BookReview bookReview) {
 
     }
@@ -91,7 +92,7 @@ public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAcc
 
     @Override
     public List<Supplier> retrieveSuppliers(Book book) {
-        return getBackend().getStream(BookSupplier.class)
+        return getCrud().getStream(BookSupplier.class)
                 .filter(bs -> bs.getBook().equals(book))
                 .map(BookSupplier::getSupplier)
                 .collect(Collectors.toList());

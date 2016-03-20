@@ -1,9 +1,12 @@
 package hgyw.com.bookshare.entities;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Yoni on 3/15/2016.
  */
 public class Book extends Entity {
+
     public enum Genre {ACTION, ROMANCE, SCIENCE, SCIENCE_FICTION,
         DRAMA, SATIRE, CHILDREN, COMICS, BIOGRAPHIES, FANTASY, HEALTH}
 
@@ -11,6 +14,7 @@ public class Book extends Entity {
     private String bookAbstract;
     private String author;
     private Genre genre;
+    private Bitmap image;
 
     public String getTitle() {
         return title;
@@ -42,5 +46,13 @@ public class Book extends Entity {
 
     public void setGenre(Genre genre) {
         this.genre = genre;
+    }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
     }
 }

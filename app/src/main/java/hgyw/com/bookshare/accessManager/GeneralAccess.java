@@ -24,7 +24,7 @@ public interface GeneralAccess {
     List<BookSupplier> findSpecialOffers();
     List<BookReview> getBookReviews(Book book);
 
-    User getUser();
+    Object getCurrentUser();
 
 
 }

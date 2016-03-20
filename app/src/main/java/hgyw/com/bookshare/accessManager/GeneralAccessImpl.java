@@ -2,17 +2,14 @@ package hgyw.com.bookshare.accessManager;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.Consumer;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import hgyw.com.bookshare.backend.Backend;
-import hgyw.com.bookshare.backend.BackendFactory;
+import hgyw.com.bookshare.backend.Crud;
+import hgyw.com.bookshare.backend.CrudFactory;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
@@ -26,16 +23,16 @@ import hgyw.com.bookshare.entities.User;
  */
 public class GeneralAccessImpl implements GeneralAccess {
 
-    private Backend backend = BackendFactory.getInstance();
+    private Crud crud = CrudFactory.getInstance();
+    final protected User currentUser;
 
-    User currentUser;
     public GeneralAccessImpl(User currentUser) {
         this.currentUser = currentUser;
     }
 
     @Override
     public List<BookSupplier> findBooks(BookQuery query) {
-        return backend.getStream(BookSupplier.class).filter(query).collect(Collectors.toList());
+        return crud.getStream(BookSupplier.class).filter(query).collect(Collectors.toList());
     }
 
     @Override
@@ -58,13 +55,13 @@ public class GeneralAccessImpl implements GeneralAccess {
     }
 
     private Stream<BookSupplier> getDistinctBooksOfUser() {
-        Stream<List<OrderedBook>> listsOfOrderedBooks = backend.getStream(Order.class).filter(o -> o.getCustomer() == currentUser).map(Order::getBooksList);
+        Stream<List<OrderedBook>> listsOfOrderedBooks = crud.getStream(Order.class).filter(o -> o.getCustomer() == currentUser).map(Order::getBooksList);
         Stream<Book> StreamOfBooks = Stream.of(new ArrayList<Book>());
         for (List<OrderedBook> lob: listsOfOrderedBooks.collect(Collectors.toList())){
             StreamOfBooks = Stream.concat(StreamOfBooks, Stream.of(lob).map(OrderedBook::getBook));
         }
         List<Book> listOfBooks = StreamOfBooks.distinct().collect(Collectors.toList());
-        return backend.getStream(BookSupplier.class).filter(bs -> listOfBooks.contains(bs.getBook()));
+        return crud.getStream(BookSupplier.class).filter(bs -> listOfBooks.contains(bs.getBook()));
     }
 
     private <T> List<T> getTopInstances(Stream<T> stream, int amount){
@@ -81,11 +78,18 @@ public class GeneralAccessImpl implements GeneralAccess {
 
     @Override
     public List<BookReview> getBookReviews(Book book) {
-        return null;
+        return crud.getStream(BookReview.class)
+                .filter(br -> br.getBook().equals(book))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User getUser() {
-        return null;
+    public User getCurrentUser() {
+        return (User) currentUser.clone();
     }
+
+    protected Crud getCrud() {
+        return crud;
+    }
+
 }
