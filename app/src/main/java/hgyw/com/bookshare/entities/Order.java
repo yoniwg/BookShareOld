@@ -15,6 +15,7 @@ public class Order extends Entity {
     private Customer customer;
     private Supplier supplier;
     private List<OrderedBook> booksList = new ArrayList<>();
+    OrderRating orderRating;
     private Date date = new Date();
     private boolean open;
 
@@ -33,7 +34,7 @@ public class Order extends Entity {
     @Override
     public Object clone() {
         Order newObject = (Order) super.clone();
-        newObject.booksList = this.booksList;
+        newObject.booksList = new ArrayList(this.booksList);
         return newObject;
     }
 
@@ -63,5 +64,13 @@ public class Order extends Entity {
 
     public void setOpen(boolean open) {
         this.open = open;
+    }
+
+    public OrderRating getOrderRating() {
+        return orderRating;
+    }
+
+    public void setOrderRating(OrderRating orderRating) {
+        this.orderRating = orderRating;
     }
 }

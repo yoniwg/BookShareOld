@@ -10,6 +10,7 @@ public class Book extends Entity {
     public enum Genre {ACTION, ROMANCE, SCIENCE, SCIENCE_FICTION,
         DRAMA, SATIRE, CHILDREN, COMICS, BIOGRAPHIES, FANTASY, HEALTH}
 
+
     private String title;
     private String bookAbstract;
     private String author;
