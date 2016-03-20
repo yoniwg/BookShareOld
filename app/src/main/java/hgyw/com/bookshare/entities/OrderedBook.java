@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * Created by Yoni on 3/15/2016.
  */
-public class OrderedBook {
+public class OrderedBook extends Entity{
     private Book book;
     private int amount;
     private BigDecimal unitPrice;

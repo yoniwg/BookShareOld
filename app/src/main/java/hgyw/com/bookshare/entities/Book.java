@@ -1,16 +1,16 @@
 package hgyw.com.bookshare.entities;
 
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
-
 /**
  * Created by Yoni on 3/15/2016.
  */
 public class Book extends Entity {
+    public enum Genre {ACTION, ROMANCE, SCIENCE, SCIENCE_FICTION,
+        DRAMA, SATIRE, CHILDREN, COMICS, BIOGRAPHIES, FANTASY, HEALTH}
+
     private String title;
     private String bookAbstract;
     private String author;
+    private Genre genre;
 
     public String getTitle() {
         return title;
@@ -34,5 +34,13 @@ public class Book extends Entity {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
     }
 }

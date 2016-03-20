@@ -10,6 +10,7 @@ import java.util.List;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
+import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.User;
 
 /**
@@ -19,8 +20,8 @@ public interface GeneralAccess {
 
     //==information==
 
-    List<Book> findBooks(BookQuery query);
-    List<Book> findSpecialOffers(BookQuery query);
+    List<BookSupplier> findBooks(BookQuery query);
+    List<BookSupplier> findSpecialOffers();
     List<BookReview> getBookReviews(Book book);
 
     User getUser();

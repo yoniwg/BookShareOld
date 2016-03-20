@@ -9,8 +9,12 @@ import java.math.BigDecimal;
  */
 public class BookQuery implements Predicate<BookSupplier>{
 
+
     private String titleQuery = "";
+
     private String authorQuery = "";
+
+    private Book.Genre genreQuery = null;
 
     private BigDecimal beginPrice = null;
     private BigDecimal endPrice = null;
@@ -29,6 +33,14 @@ public class BookQuery implements Predicate<BookSupplier>{
 
     public void setAuthorQuery(String authorQuery) {
         this.authorQuery = authorQuery;
+    }
+
+    public Book.Genre getGenreQuery() {
+        return genreQuery;
+    }
+
+    public void setGenreQuery(Book.Genre genreQuery) {
+        this.genreQuery = genreQuery;
     }
 
     public BigDecimal getBeginPrice() {
@@ -51,6 +63,7 @@ public class BookQuery implements Predicate<BookSupplier>{
         BigDecimal price = bookSupplier.getPrice();
         return book.getTitle().toLowerCase().contains(getTitleQuery().toLowerCase())
                 && book.getAuthor().toLowerCase().contains(getAuthorQuery().toLowerCase())
+                && (genreQuery == null || book.getGenre() == genreQuery)
                 && (beginPrice == null || price.compareTo(beginPrice) >= 0)
                 && (endPrice == null || price.compareTo(endPrice) <=0);
     }
