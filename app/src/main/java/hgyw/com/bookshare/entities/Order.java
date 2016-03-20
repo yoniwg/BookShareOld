@@ -4,6 +4,7 @@ import com.annimon.stream.Stream;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -11,12 +12,29 @@ import java.util.List;
  */
 public class Order extends Entity {
 
-    Customer customer;
-    Supplier supplier;
-    List<OrderedBook> booksList = new ArrayList<>();
+    private Customer customer;
+    private Supplier supplier;
+    private List<OrderedBook> booksList = new ArrayList<>();
+    private Date date = new Date();
+    private boolean open;
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
     BigDecimal calcTotalPrice() {
         return Stream.of(booksList).map(OrderedBook::calcTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Override
+    public Object clone() {
+        Order newObject = (Order) super.clone();
+        newObject.booksList = this.booksList;
+        return newObject;
     }
 
     public Customer getCustomer() {
@@ -39,7 +57,11 @@ public class Order extends Entity {
         return booksList;
     }
 
-    public void setBooksList(List<OrderedBook> booksList) {
-        this.booksList = booksList;
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
     }
 }

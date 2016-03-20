@@ -2,6 +2,7 @@ package hgyw.com.bookshare.backend;
 
 import com.annimon.stream.Stream;
 
+import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Entity;
 
 /**
@@ -14,4 +15,6 @@ public interface Backend {
     void deleteEntity(Entity entity);
 
     <T extends Entity> Stream<T> getStream(Class<T> entityType);
+
+    <T extends Entity> T retrieveEntity(Class<T> entityClass, long id);
 }

@@ -1,6 +1,12 @@
 package hgyw.com.bookshare.entities;
 
+import com.annimon.stream.Stream;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * Created by Yoni on 3/15/2016.
@@ -18,7 +24,6 @@ public abstract class Entity implements Cloneable{
 
     @Override
     public Object clone() {
-        // TODO: deep copy
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {
@@ -37,5 +42,10 @@ public abstract class Entity implements Cloneable{
     @Override
     public int hashCode() {
         return Long.valueOf(getId()).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " {id=" + getId() + "}";
     }
 }
