@@ -25,10 +25,21 @@ public abstract class Entity implements Cloneable{
     @Override
     public Object clone() {
         try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            //Unreached code
-            throw new InternalError("Unreached code");
+            Entity newEntity = (Entity) super.clone();
+            // Clone entity references in this item:
+            for (Field f : newEntity.getClass().getDeclaredFields()) {
+                if (f.isAccessible() && Entity.class.isAssignableFrom(f.getType())) {
+                    Entity value = (Entity) f.get(newEntity);
+                    f.set(newEntity, value.clone());
+                }
+            }
+            return newEntity;
+        }
+        catch (IllegalAccessException e) {
+            throw new InternalError("Unreached code"); // Unreached code - isAccessible required below
+        }
+        catch (CloneNotSupportedException e) {
+            throw new InternalError("Unreached code"); // Unreached code
         }
     }
 
