@@ -7,6 +7,7 @@ import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
+import hgyw.com.bookshare.entities.OrderRating;
 import hgyw.com.bookshare.entities.Supplier;
 
 /**
@@ -23,9 +24,9 @@ public interface CustomerAccess extends GeneralAccess {
     List<Order> retrieveOpenOrders();
 
     void performNewOrder(Order order);
-    void cancelOrder(Order order);
-    void updateOrderResponse(Order order);
-    void updateBookReview(BookReview bookReview);
+    void cancelOrder(long orderId);
+    void updateOrderRating(long orderId, OrderRating orderRating);
+    void writeBookReview(BookReview bookReview);
     void removeBookReview(BookReview bookReview);
 
     List<Supplier> retrieveSuppliers(Book book);

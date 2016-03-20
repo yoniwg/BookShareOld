@@ -11,6 +11,7 @@ import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
+import hgyw.com.bookshare.entities.OrderRating;
 import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 
@@ -67,27 +68,30 @@ public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAcc
 
     @Override
     public void performNewOrder(Order order) {
-
+        // TODO: That's it? Any validation?
+        getCrud().createEntity(order);
     }
 
     @Override
-    public void cancelOrder(Order order) {
-
+    public void cancelOrder(long orderId) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public void updateOrderResponse(Order order) {
-
+    public void updateOrderRating(long orderId, OrderRating orderRating) {
+        Order order = getCrud().retrieveEntity(Order.class, orderId);
+        order.setOrderRating(orderRating);
+        getCrud().updateEntity(order);
     }
 
     @Override
-    public void updateBookReview(BookReview bookReview) {
-
+    public void writeBookReview(BookReview bookReview) {
+        getCrud().updateEntity(bookReview);
     }
 
     @Override
     public void removeBookReview(BookReview bookReview) {
-
+        getCrud().deleteEntity(bookReview);
     }
 
     @Override

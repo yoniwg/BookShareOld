@@ -30,7 +30,8 @@ public enum ListsCrudImpl implements Crud {
             throw new IllegalArgumentException("ID must be 0");
         }
 
-        entityList.add(generateNewEntity(entity));
+        generateNewId(entity);
+        entityList.add((Entity) entity.clone());
     }
 
     private List<Entity> getListOrCreate(Class<? extends Entity> clazz) {
@@ -42,12 +43,10 @@ public enum ListsCrudImpl implements Crud {
         return entityList;
     }
 
-    private Entity generateNewEntity(Entity entity) {
-        Entity newEntity = (Entity) entity.clone();
-        long entityId = entitiesIdMap.get(newEntity.getClass()) + 1;
-        newEntity.setId(entityId);
-        entitiesIdMap.put(newEntity.getClass(), entityId);
-        return newEntity;
+    private void generateNewId(Entity entity) {
+        long entityId = entitiesIdMap.get(entity.getClass()) + 1;
+        entity.setId(entityId);
+        entitiesIdMap.put(entity.getClass(), entityId);
     }
 
     @Override
@@ -71,13 +70,12 @@ public enum ListsCrudImpl implements Crud {
         return Stream.empty();
     }
 
-
     @Override
     public <T extends Entity> T retrieveEntity(Class<T> entityClass, long id) {
         Optional<T> entity = getStream(entityClass)
                 .filter(e -> e.getId() == id)
                 .findFirst();
-        if (entity.isPresent()) return entity.get();
+        if (entity.isPresent()) return (T) entity.get().clone();
         throw new NoSuchElementException("No such entity with such ID");
     }
 

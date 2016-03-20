@@ -8,8 +8,8 @@ public class OrderRating {
     public enum Rating {EMPTY ,POOR, BAD, MEDIUM, GOOD, EXCELLENT}
 
     Rating itemAsDescribed = Rating.EMPTY;
-    Rating shippingTime= Rating.EMPTY;
-    Rating communication= Rating.EMPTY;
+    Rating shippingTime = Rating.EMPTY;
+    Rating communication = Rating.EMPTY;
 
     public Rating getItemAsDescribed() {
         return itemAsDescribed;

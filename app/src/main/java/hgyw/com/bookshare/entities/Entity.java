@@ -23,7 +23,7 @@ public abstract class Entity implements Cloneable{
     }
 
     @Override
-    public Object clone() {
+    public Entity clone() {
         try {
             Entity newEntity = (Entity) super.clone();
             // Clone entity references in this item:
