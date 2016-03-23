@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import hgyw.com.bookshare.backend.Crud;
-import hgyw.com.bookshare.backend.CrudFactory;
+import hgyw.com.bookshare.crud.Crud;
+import hgyw.com.bookshare.crud.CrudFactory;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
@@ -32,7 +32,7 @@ public class GeneralAccessImpl implements GeneralAccess {
 
     @Override
     public List<BookSupplier> findBooks(BookQuery query) {
-        return crud.getStream(BookSupplier.class).filter(query).collect(Collectors.toList());
+        return crud.streamAll(BookSupplier.class).filter(query).collect(Collectors.toList());
     }
 
     @Override
@@ -55,13 +55,13 @@ public class GeneralAccessImpl implements GeneralAccess {
     }
 
     private Stream<BookSupplier> getDistinctBooksOfUser() {
-        Stream<List<OrderedBook>> listsOfOrderedBooks = crud.getStream(Order.class).filter(o -> o.getCustomer() == currentUser).map(Order::getBooksList);
+        Stream<List<OrderedBook>> listsOfOrderedBooks = crud.streamAll(Order.class).filter(o -> o.getCustomer() == currentUser).map(Order::getOrderedBooks);
         Stream<Book> StreamOfBooks = Stream.of(new ArrayList<Book>());
         for (List<OrderedBook> lob: listsOfOrderedBooks.collect(Collectors.toList())){
-            StreamOfBooks = Stream.concat(StreamOfBooks, Stream.of(lob).map(OrderedBook::getBook));
+            StreamOfBooks = Stream.concat(StreamOfBooks, Stream.of(lob).map(OrderedBook::getBookSupplier).map(BookSupplier::getBook));
         }
         List<Book> listOfBooks = StreamOfBooks.distinct().collect(Collectors.toList());
-        return crud.getStream(BookSupplier.class).filter(bs -> listOfBooks.contains(bs.getBook()));
+        return crud.streamAll(BookSupplier.class).filter(bs -> listOfBooks.contains(bs.getBook()));
     }
 
     private <T> List<T> getTopInstances(Stream<T> stream, int amount){
@@ -78,7 +78,7 @@ public class GeneralAccessImpl implements GeneralAccess {
 
     @Override
     public List<BookReview> getBookReviews(Book book) {
-        return crud.getStream(BookReview.class)
+        return crud.streamAll(BookReview.class)
                 .filter(br -> br.getBook().equals(book))
                 .collect(Collectors.toList());
     }

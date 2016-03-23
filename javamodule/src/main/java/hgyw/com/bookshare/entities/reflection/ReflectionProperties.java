@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by haim7 on 23/03/2016.
  */
-public class ReflectionProperties  {
+public class ReflectionProperties extends Reflection {
 
 
     public static Collection<Property> getProperties(Class<?> clazz) {
@@ -23,8 +23,8 @@ public class ReflectionProperties  {
     private static Map<String, Property> getPropertiesMap(Class<?> clazz) {
         Map<String, Property> map = new HashMap<>();
         for (Method m : clazz.getMethods())
-            if (Reflection.isGetter(m)) {
-                Property p = new ReflectedProperty(Reflection.propertyNameFromGetter(m), m, getSetterByGetter(m));
+            if (isGetter(m)) {
+                Property p = new ReflectedProperty(propertyNameFromGetter(m), m, getSetterByGetter(m));
                 map.put(p.getName(), p);
             }
         return map;
@@ -64,7 +64,7 @@ public class ReflectionProperties  {
         }
 
         @Override
-        public boolean canWriten() {
+        public boolean canWrite() {
             return setter != null;
         }
 

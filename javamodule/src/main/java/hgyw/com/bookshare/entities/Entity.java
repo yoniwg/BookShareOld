@@ -1,9 +1,12 @@
 package hgyw.com.bookshare.entities;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import hgyw.com.bookshare.entities.reflection.Property;
 import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
+import hgyw.com.bookshare.entities.reflection.ReflectionToString;
 
 /**
  * Created by Yoni on 3/15/2016.
@@ -23,12 +26,23 @@ public abstract class Entity implements Cloneable{
     public Entity clone() {
         try {
             Entity newEntity = (Entity) super.clone();
-            // Clone entity references in this item:
+            // deep cloning
             for (Property p : ReflectionProperties.getProperties(getClass())) {
-                if (p.canWriten() && Entity.class.isAssignableFrom(p.getPropertyClass())) {
-                    Entity value = (Entity) p.get(newEntity);
-                    if (value != null) value = value.clone();
-                    p.set(newEntity, value);
+                if (p.canWrite()) {
+                    // Clone entity references in this item
+                    if (Entity.class.isAssignableFrom(p.getPropertyClass())) {
+                        Entity value = (Entity) p.get(newEntity);
+                        if (value != null) value = value.clone();
+                        p.set(newEntity, value);
+                    }
+                    // Clone entity references in list in this item
+                    else if (Collection.class.isAssignableFrom(p.getPropertyClass())) {
+                        Collection<?> value = (Collection) p.get(newEntity);
+                        Collection<Object> newCollection = new ArrayList<>(value);
+                        for (Object o : value) newCollection.add(o instanceof Entity ?((Entity)o).clone() : o);
+                        p.set(newEntity, newCollection);
+                    }
+
                 }
             }
             return newEntity;
@@ -52,6 +66,6 @@ public abstract class Entity implements Cloneable{
 
     @Override
     public String toString() {
-        return hgyw.com.bookshare.entities.reflection.Reflection.publicGettersToString(this);
+        return ReflectionToString.publicGettersToString(this);
     }
 }

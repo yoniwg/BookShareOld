@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.backend;
+package hgyw.com.bookshare.crud;
 
 /**
  * Created by Yoni on 3/17/2016.

@@ -1,25 +1,44 @@
 package hgyw.com.bookshare.entities;
 
+import java.util.Objects;
+
 /**
- * Created by Yoni on 3/15/2016.
+ * Immutable class represents username and password.
  */
-public class Credentials {
-    private String username;
-    private String password;
+public final class Credentials {
+    public static Credentials EMPTY = new Credentials("", "");
+
+    private final String username;
+    private final String password;
+
+    private Credentials(String username, String password) {
+        this.username = Objects.requireNonNull(username);
+        this.password = Objects.requireNonNull(password);
+    }
+
+    public static Credentials create(String username, String password) {
+        return new Credentials(username, password);
+    }
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Credentials that = (Credentials) o;
+        return username.equals(that.username) &&  password.equals(that.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, password);
     }
 }

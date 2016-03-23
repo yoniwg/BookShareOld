@@ -38,30 +38,30 @@ public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAcc
 
     @Override
     public List<BookReview> getCustomerReviews() {
-        return getCrud().getStream(BookReview.class)
+        return getCrud().streamAll(BookReview.class)
                 .filter(r -> r.getReviewer().equals(currentUser))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Customer> findInterestedInBook(Book book) {
-        return getCrud().getStream(Order.class)
-                .filter(o -> Stream.of(o.getBooksList())
-                        .anyMatch(ob -> ob.getBook().equals(book)))
+        return getCrud().streamAll(Order.class)
+                .filter(o -> Stream.of(o.getOrderedBooks())
+                        .anyMatch(ob -> ob.getBookSupplier().getBook().equals(book)))
                 .map(Order::getCustomer)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Order> retrieveOrders(Date fromDate, Date toDate) {
-        return getCrud().getStream(Order.class)
+        return getCrud().streamAll(Order.class)
                 .filter(o -> o.getDate().compareTo(fromDate) >= 0 && o.getDate().compareTo(toDate) <= 0)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Order> retrieveOpenOrders() {
-        return getCrud().getStream(Order.class)
+        return getCrud().streamAll(Order.class)
                 .filter(Order::isOpen)
                 .collect(Collectors.toList());
     }
@@ -96,7 +96,7 @@ public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAcc
 
     @Override
     public List<Supplier> retrieveSuppliers(Book book) {
-        return getCrud().getStream(BookSupplier.class)
+        return getCrud().streamAll(BookSupplier.class)
                 .filter(bs -> bs.getBook().equals(book))
                 .map(BookSupplier::getSupplier)
                 .collect(Collectors.toList());

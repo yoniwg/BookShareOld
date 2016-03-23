@@ -9,7 +9,7 @@ public interface Property {
     void set(Object o, Object value) throws InvocationTargetException, IllegalAccessException;
     Object get(Object o) throws InvocationTargetException, IllegalAccessException;
     String getName();
-    boolean canWriten();
+    boolean canWrite();
     Class<?> getPropertyClass();
     Class<?> getReflectedClass();
 }

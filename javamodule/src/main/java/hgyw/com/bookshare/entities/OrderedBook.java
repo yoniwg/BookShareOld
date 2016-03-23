@@ -6,17 +6,9 @@ import java.math.BigDecimal;
  * Created by Yoni on 3/15/2016.
  */
 public class OrderedBook extends Entity{
-    private Book book;
-    private int amount;
-    private BigDecimal unitPrice;
-
-    public Book getBook() {
-        return book;
-    }
-
-    public void setBook(Book book) {
-        this.book = book;
-    }
+    private BookSupplier bookSupplier;
+    private int amount = 1;
+    private BigDecimal unitPrice = BigDecimal.ZERO;
 
     public int getAmount() {
         return amount;
@@ -34,7 +26,19 @@ public class OrderedBook extends Entity{
         this.unitPrice = unitPrice;
     }
 
+    public void computePriceByBookSupplier() {
+        unitPrice = bookSupplier.getPrice();
+    }
+
     public BigDecimal calcTotalPrice() {
         return getUnitPrice().multiply(BigDecimal.valueOf(getAmount()));
+    }
+
+    public BookSupplier getBookSupplier() {
+        return bookSupplier;
+    }
+
+    public void setBookSupplier(BookSupplier bookSupplier) {
+        this.bookSupplier = bookSupplier;
     }
 }

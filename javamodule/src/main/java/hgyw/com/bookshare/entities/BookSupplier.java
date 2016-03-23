@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 public class BookSupplier extends Entity {
     private Supplier supplier;
     private Book book;
-    private BigDecimal price;
-    private int amountAvailable;
+    private BigDecimal price = BigDecimal.ZERO;
+    private int amountAvailable = 100;
 
     public int getAmountAvailable() {
         return amountAvailable;

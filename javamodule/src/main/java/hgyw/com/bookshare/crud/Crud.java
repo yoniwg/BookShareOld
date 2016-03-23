@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.backend;
+package hgyw.com.bookshare.crud;
 
 import com.annimon.stream.Stream;
 
@@ -37,7 +37,7 @@ public interface Crud {
      * @param <T> The type of entity
      * @return Stream of type T contains the items
      */
-    <T extends Entity> Stream<T> getStream(Class<T> entityClass);
+    <T extends Entity> Stream<T> streamAll(Class<T> entityClass);
 
     /**
      * Retrieve an entity from database.

@@ -7,7 +7,7 @@ import java.sql.Date;
  */
 public abstract class User extends Entity {
 
-    private Credentials credentials;
+    private Credentials credentials = Credentials.EMPTY;
     private String email;
     private String address;
     private String phoneNumber;

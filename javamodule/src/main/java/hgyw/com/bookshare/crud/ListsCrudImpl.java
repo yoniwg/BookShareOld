@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.backend;
+package hgyw.com.bookshare.crud;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
@@ -62,7 +62,7 @@ public enum ListsCrudImpl implements Crud {
     }
 
     @Override
-    public <T extends Entity> Stream<T> getStream(Class<T> entityType) {
+    public <T extends Entity> Stream<T> streamAll(Class<T> entityType) {
         List<Entity> entityList = entitiesMap.get(entityType);
         if (entityList != null) return Stream.of(entityList).map(e -> (T) e);
         return Stream.empty();
@@ -70,7 +70,7 @@ public enum ListsCrudImpl implements Crud {
 
     @Override
     public <T extends Entity> T retrieveEntity(Class<T> entityClass, long id) {
-        Optional<T> entity = getStream(entityClass)
+        Optional<T> entity = streamAll(entityClass)
                 .filter(e -> e.getId() == id)
                 .findFirst();
         if (entity.isPresent()) return (T) entity.get().clone();
