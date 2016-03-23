@@ -32,7 +32,7 @@ public class Order extends Entity {
     }
 
     @Override
-    public Object clone() {
+    public Entity clone() {
         Order newObject = (Order) super.clone();
         newObject.booksList = new ArrayList(this.booksList);
         return newObject;

@@ -22,16 +22,14 @@ public enum ListsCrudImpl implements Crud {
     private Map<Class<? extends Entity>, List<Entity>> entitiesMap = new HashMap<>();
 
     @Override
-    public void createEntity(Entity entity) {
+    public void createEntity(Entity item) {
+        List<Entity> entityList = getListOrCreate(item.getClass());
 
-        List<Entity> entityList = getListOrCreate(entity.getClass());
-
-        if (entity.getId() != 0) {
+        if (item.getId() != 0) {
             throw new IllegalArgumentException("ID must be 0");
         }
-
-        generateNewId(entity);
-        entityList.add((Entity) entity.clone());
+        generateNewId(item);
+        entityList.add((Entity) item.clone());
     }
 
     private List<Entity> getListOrCreate(Class<? extends Entity> clazz) {
@@ -50,15 +48,15 @@ public enum ListsCrudImpl implements Crud {
     }
 
     @Override
-    public void updateEntity(Entity entity) {
-        deleteEntity(entity);
-        getListOrCreate(entity.getClass()).add(entity);
+    public void updateEntity(Entity item) {
+        deleteEntity(item);
+        getListOrCreate(item.getClass()).add(item);
     }
 
     @Override
-    public void deleteEntity(Entity entity) {
-        List<Entity> entityList = entitiesMap.get(entity.getClass());
-        if (entityList == null || !entityList.remove(entity)) {
+    public void deleteEntity(Entity item) {
+        List<Entity> entityList = entitiesMap.get(item.getClass());
+        if (entityList == null || !entityList.remove(item)) {
             throw new NoSuchElementException("No such entity with such ID");
         }
     }

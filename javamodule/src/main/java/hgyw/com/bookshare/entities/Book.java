@@ -1,7 +1,5 @@
 package hgyw.com.bookshare.entities;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by Yoni on 3/15/2016.
  */
@@ -15,7 +13,7 @@ public class Book extends Entity {
     private String bookAbstract;
     private String author;
     private Genre genre;
-    private Bitmap image;
+    private ImageEntity image;
 
     public String getTitle() {
         return title;
@@ -49,11 +47,11 @@ public class Book extends Entity {
         this.genre = genre;
     }
 
-    public Bitmap getImage() {
+    public ImageEntity getImage() {
         return image;
     }
 
-    public void setImage(Bitmap image) {
+    public void setImage(ImageEntity image) {
         this.image = image;
     }
 }

@@ -34,4 +34,13 @@ public class OrderRating {
     public void setCommunication(Rating communication) {
         this.communication = communication;
     }
+
+    @Override
+    public String toString() {
+        return "OrderRating{" +
+                "itemAsDescribed=" + itemAsDescribed +
+                ", shippingTime=" + shippingTime +
+                ", communication=" + communication +
+                '}';
+    }
 }

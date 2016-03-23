@@ -1,5 +1,6 @@
 package hgyw.com.bookshare.accessManager;
 
+import hgyw.com.bookshare.backend.Crud;
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Guest;
 import hgyw.com.bookshare.entities.User;
@@ -69,4 +70,5 @@ public enum  AccessManager{
     public UserType getCurrentUserType() {
         return UserType.ofClass(currentUser.getClass());
     }
+
 }
