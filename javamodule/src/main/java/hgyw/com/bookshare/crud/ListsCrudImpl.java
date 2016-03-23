@@ -1,22 +1,28 @@
 package hgyw.com.bookshare.crud;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import hgyw.com.bookshare.entities.Entity;
+import hgyw.com.bookshare.entities.reflection.Property;
+import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
 
 /**
  * Created by Yoni on 3/17/2016.
  */
-public enum ListsCrudImpl implements Crud {
+class ListsCrudImpl implements Crud {
 
-    INSTANCE;
+    //final ListsCrudImpl INSTANCE = new ListsCrudImpl();
+    protected ListsCrudImpl() {}
 
     private Map<Class<? extends Entity>, Long> entitiesIdMap = new HashMap<>();
     private Map<Class<? extends Entity>, List<Entity>> entitiesMap = new HashMap<>();
@@ -76,5 +82,17 @@ public enum ListsCrudImpl implements Crud {
         if (entity.isPresent()) return (T) entity.get().clone();
         throw new NoSuchElementException("No such entity with such ID");
     }
+
+    @Override
+    public <T extends Entity> Collection<T> findEntityReferTo(Class<T> referringClass, Entity referredItem) {
+        Property p = ReflectionProperties.getPropertyOfType(referringClass, referredItem.getClass());
+        return streamAll(referringClass)
+                .filter(e -> {
+                    try {
+                        return p.get(e).equals(referredItem);
+                    } catch (InvocationTargetException | IllegalAccessException e1) { return false; }
+                }).collect(Collectors.toList());
+    }
+
 
 }

@@ -1,5 +1,6 @@
-package hgyw.com.bookshare.accessManager;
+package hgyw.com.bookshare.logicAccess;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -18,10 +19,10 @@ public interface CustomerAccess extends GeneralAccess {
     Customer retrieveCustomerDetails();
     void updateCustomerDetails(Customer newDetails);
 
-    List<BookReview> getCustomerReviews();
-    List<Customer> findInterestedInBook(Book book);
-    List<Order> retrieveOrders(Date fromDate, Date toDate);
-    List<Order> retrieveOpenOrders();
+    Collection<BookReview> getCustomerReviews();
+    Collection<Customer> findInterestedInBook(Book book);
+    Collection<Order> retrieveOrders(Date fromDate, Date toDate);
+    Collection<Order> retrieveOpenOrders();
 
     void performNewOrder(Order order);
     void cancelOrder(long orderId);
@@ -29,5 +30,5 @@ public interface CustomerAccess extends GeneralAccess {
     void writeBookReview(BookReview bookReview);
     void removeBookReview(BookReview bookReview);
 
-    List<Supplier> retrieveSuppliers(Book book);
+    Collection<Supplier> retrieveSuppliers(Book book);
 }

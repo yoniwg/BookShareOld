@@ -11,10 +11,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import hgyw.com.bookshare.accessManager.AccessManager;
-import hgyw.com.bookshare.accessManager.AccessManagerImpl;
-import hgyw.com.bookshare.accessManager.CustomerAccess;
-import hgyw.com.bookshare.accessManager.GeneralAccess;
+import hgyw.com.bookshare.logicAccess.AccessManager;
+import hgyw.com.bookshare.logicAccess.AccessManagerImpl;
+import hgyw.com.bookshare.logicAccess.CustomerAccess;
+import hgyw.com.bookshare.logicAccess.GeneralAccess;
 import hgyw.com.bookshare.crud.Crud;
 import hgyw.com.bookshare.crud.CrudFactory;
 import hgyw.com.bookshare.entities.Book;
@@ -41,7 +41,7 @@ public class javaProgram {
         System.out.println("initializing TOTAL-TIME = " + (-startTimeCount + (startTimeCount = System.currentTimeMillis())));
 
         {
-            System.out.println("*** Reflection method and fields retrieve methods ***");
+            System.out.println("*** Reflection methods example ***");
             Class<?> c = Book.class;
             System.out.println("M: "+ Stream.of(c.getMethods()).map(Member::getName).collect(Collectors.toList()));
             System.out.println("DM: " + Stream.of(c.getDeclaredMethods()).map(Member::getName).collect(Collectors.toList()));
@@ -90,6 +90,8 @@ public class javaProgram {
 
         CustomerAccess cAccess;
 
+        // Signing:
+
         System.out.println("\ntrying to access as customer.");
         try { cAccess = manager.getCustomerAccess();}
         catch (Exception e) { System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage()); }
@@ -105,8 +107,27 @@ public class javaProgram {
         System.out.println("registering...");
         manager.signIn(Credentials.create("root", "1234"));
         System.out.println("current user type: " + manager.getCurrentUserType());
-        cAccess = manager.getCustomerAccess();
 
+        System.out.println("\ntrying to register again.");
+        try { manager.signIn(Credentials.create("yaakov", "34")); }
+        catch (Exception e) { System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage()); }
+        System.out.println("trying end.");
+        System.out.println("current user type: " + manager.getCurrentUserType());
+
+        System.out.println("\ntrying to signout.");
+        try { manager.signOut(); }
+        catch (Exception e) { System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage()); }
+        System.out.println("trying end.");
+        System.out.println("current user type: " + manager.getCurrentUserType());
+
+        System.out.println("\nregistering...");
+        manager.signIn(Credentials.create("root", "1234"));
+        System.out.println("current user type: " + manager.getCurrentUserType());
+
+        // Customer access:
+
+        System.out.println("\n*** Customer access checing: ***");
+        cAccess = manager.getCustomerAccess();
         System.out.println("User Reviews: " + cAccess.getCustomerReviews());
     }
 
@@ -227,7 +248,7 @@ public class javaProgram {
                 br.setTitle(generateRandomString(10));
                 br.setDescription(generateRandomString(5));
                 br.setRating((int) (Math.random() * 5));
-                br.setReviewer(getRandomItem(Customer.class));
+                br.setUser(getRandomItem(Customer.class));
                 crud.createEntity(br);
             }
 
@@ -279,6 +300,6 @@ public class javaProgram {
                 newWord = false;
             }
         }
-        return str.toString();
+        return str.toString().trim();
     }
 }

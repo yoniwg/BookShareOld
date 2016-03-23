@@ -5,6 +5,9 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+
+import hgyw.com.bookshare.entities.Entity;
 
 /**
  * Created by haim7 on 23/03/2016.
@@ -36,6 +39,13 @@ public class ReflectionProperties extends Reflection {
         } catch (NoSuchMethodException e) {
             return null;
         }
+    }
+
+    public static <T extends Entity> Property getPropertyOfType(Class<T> clazz, Class<? extends Entity> propertyType) {
+        for (Property p : getPropertiesMap(clazz).values())
+            if (p.getPropertyClass() == propertyType)
+                return p;
+        throw new NoSuchElementException("No property of type " + propertyType.getSimpleName() + " in class " + clazz.getSimpleName());
     }
 
     private static class ReflectedProperty implements Property {

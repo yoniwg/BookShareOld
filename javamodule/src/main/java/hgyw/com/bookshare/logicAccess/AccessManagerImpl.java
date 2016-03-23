@@ -1,12 +1,8 @@
-package hgyw.com.bookshare.accessManager;
+package hgyw.com.bookshare.logicAccess;
 
-import com.annimon.stream.Stream;
-
-import hgyw.com.bookshare.crud.CrudFactory;
+import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Credentials;
-import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Guest;
-import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 import hgyw.com.bookshare.entities.UserType;
 
@@ -17,6 +13,7 @@ public enum AccessManagerImpl implements AccessManager {
 
     INSTANCE;
 
+    final private ExpandedCrud crud = new ExpandedCrud();
     private GeneralAccess currentAccess;
     private User currentUser;
     private User guest = new Guest();
@@ -29,33 +26,29 @@ public enum AccessManagerImpl implements AccessManager {
 
     @Override
     public void signUp(User user) {
+        if (user.getId() == 0) throw new IllegalArgumentException("New item should have id 0.");
+        if (crud.isUsernameTaken(user.getCredentials().getUsername())) {
+            throw new RuntimeException("Username and password are taken.");
+        }
+        crud.createEntity(user);
         signIn(user.getCredentials());
     }
 
     @Override
     public void signIn(Credentials credentials) {
         if (currentUser != guest) throw new IllegalStateException("There has been a user that is signed in.");
-        currentUser = streamAllUsers()
-                .filter(u -> u.getCredentials().equals(credentials))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Wrong usenname and password")); // TODO sacrificial exception
+        currentUser = crud.retrieveUserWithCredentials(credentials);
+        if (currentUser == null) throw new RuntimeException("Wrong usenname and password"); // TODO specific exception
         switchAccess();
     }
 
-    private Stream<User> streamAllUsers() {
-        return Stream.concat(
-                CrudFactory.getInstance().streamAll(Customer.class),
-                CrudFactory.getInstance().streamAll(Supplier.class)
-        );
-    }
-
     private void switchAccess() {
-        switch (UserType.ofClass(currentUser.getClass())) {
+        switch (getCurrentUserType()) {
             case GUEST:
-                currentAccess = new GeneralAccessImpl(currentUser);
+                currentAccess = new GeneralAccessImpl(crud, currentUser);
                 break;
             case CUSTOMER:
-                currentAccess = new CustomerAccessImpl(currentUser);
+                currentAccess = new CustomerAccessImpl(crud, currentUser);
                 break;
             case SUPPLIER:
                 //currentAccess = new SupplierAccessImpl(currentUser);
@@ -91,7 +84,7 @@ public enum AccessManagerImpl implements AccessManager {
 
     @Override
     public UserType getCurrentUserType() {
-        return UserType.ofClass(currentUser.getClass());
+        return currentUser.userType();
     }
 
 }

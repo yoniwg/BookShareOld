@@ -64,7 +64,6 @@ public class BookQuery implements Predicate<BookSupplier>{
         return book.getTitle().toLowerCase().contains(getTitleQuery().toLowerCase())
                 && book.getAuthor().toLowerCase().contains(getAuthorQuery().toLowerCase())
                 && (genreQuery == null || book.getGenre() == genreQuery)
-                && (beginPrice == null || price.compareTo(beginPrice) >= 0)
-                && (endPrice == null || price.compareTo(endPrice) <=0);
+                && Auxiliaries.isBetween(price, beginPrice, endPrice);
     }
 }

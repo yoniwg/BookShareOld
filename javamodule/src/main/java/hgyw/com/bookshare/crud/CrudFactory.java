@@ -19,7 +19,7 @@ public class CrudFactory {
         if (crud == null) {
             switch (currentDB) {
                 case LISTS:
-                    crud = ListsCrudImpl.INSTANCE;
+                    crud = new ListsCrudImpl();
                     break;
                 case SQL_LITE:
                     //TODO

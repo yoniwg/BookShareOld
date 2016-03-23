@@ -2,6 +2,8 @@ package hgyw.com.bookshare.crud;
 
 import com.annimon.stream.Stream;
 
+import java.util.Collection;
+
 import hgyw.com.bookshare.entities.Entity;
 
 /**
@@ -48,4 +50,13 @@ public interface Crud {
      * @throws java.util.NoSuchElementException If database doesn't contain item of this entity and id.
      */
     <T extends Entity> T retrieveEntity(Class<T> entityClass, long id);
+
+    /**
+     * Find list of one/many-to-one/many relation from class T. ???
+     * @param <T>
+     * @param referringClass
+     * @param referredItem
+     * @return
+     */
+    <T extends Entity> Collection<T> findEntityReferTo(Class<T> referringClass, Entity referredItem);
 }

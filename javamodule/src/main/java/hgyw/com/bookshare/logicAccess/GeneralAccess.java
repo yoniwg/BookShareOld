@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.accessManager;
+package hgyw.com.bookshare.logicAccess;
 
 import java.util.List;
 

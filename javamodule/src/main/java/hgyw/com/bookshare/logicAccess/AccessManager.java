@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.accessManager;
+package hgyw.com.bookshare.logicAccess;
 
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.User;
@@ -18,7 +18,7 @@ public interface AccessManager {
 
     CustomerAccess getCustomerAccess();
 
-    SupplierAccess getSupplierAccess();
+    hgyw.com.bookshare.logicAccess.SupplierAccess getSupplierAccess();
 
     UserType getCurrentUserType();
 }

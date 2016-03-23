@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.accessManager;
+package hgyw.com.bookshare.logicAccess;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
@@ -8,8 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import hgyw.com.bookshare.crud.Crud;
-import hgyw.com.bookshare.crud.CrudFactory;
+import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
@@ -23,10 +22,11 @@ import hgyw.com.bookshare.entities.User;
  */
 public class GeneralAccessImpl implements GeneralAccess {
 
-    private Crud crud = CrudFactory.getInstance();
+    final protected ExpandedCrud crud;
     final protected User currentUser;
 
-    public GeneralAccessImpl(User currentUser) {
+    public GeneralAccessImpl(ExpandedCrud crud, User currentUser) {
+        this.crud = crud;
         this.currentUser = currentUser;
     }
 
@@ -86,10 +86,6 @@ public class GeneralAccessImpl implements GeneralAccess {
     @Override
     public User getCurrentUser() {
         return (User) currentUser.clone();
-    }
-
-    protected Crud getCrud() {
-        return crud;
     }
 
 }
