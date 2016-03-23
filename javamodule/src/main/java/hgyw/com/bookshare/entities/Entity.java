@@ -2,6 +2,7 @@ package hgyw.com.bookshare.entities;
 
 import java.lang.reflect.InvocationTargetException;
 
+import hgyw.com.bookshare.entities.reflection.Property;
 import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
 
 /**
@@ -23,7 +24,7 @@ public abstract class Entity implements Cloneable{
         try {
             Entity newEntity = (Entity) super.clone();
             // Clone entity references in this item:
-            for (hgyw.com.bookshare.entities.reflection.ReflectionProperties.Property p : ReflectionProperties.getProperties(getClass())) {
+            for (Property p : ReflectionProperties.getProperties(getClass())) {
                 if (p.canWriten() && Entity.class.isAssignableFrom(p.getPropertyClass())) {
                     Entity value = (Entity) p.get(newEntity);
                     if (value != null) value = value.clone();
