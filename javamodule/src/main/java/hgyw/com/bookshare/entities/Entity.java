@@ -47,20 +47,20 @@ public abstract class Entity implements Cloneable{
             }
             return newEntity;
         }
-        catch (IllegalAccessException | CloneNotSupportedException | InvocationTargetException e) {
+        catch (CloneNotSupportedException | InvocationTargetException e) {
             throw new InternalError("Unreached code", e); // Unreached code - isAccessible required below
         }
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (o == null || this.getClass() != o.getClass()) return false;
         Entity other = (Entity) o;
-        return this.getId() == other.getId();
+        return this.getClass() == other.getClass() && this.getId() == other.getId();
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Long.valueOf(getId()).hashCode();
     }
 

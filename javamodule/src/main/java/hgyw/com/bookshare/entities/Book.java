@@ -54,4 +54,5 @@ public class Book extends Entity {
     public void setImage(ImageEntity image) {
         this.image = image;
     }
+
 }

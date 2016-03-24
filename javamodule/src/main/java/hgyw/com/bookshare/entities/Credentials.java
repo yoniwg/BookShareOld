@@ -6,7 +6,8 @@ import java.util.Objects;
  * Immutable class represents username and password.
  */
 public final class Credentials {
-    public static Credentials EMPTY = new Credentials("", "");
+
+    public static final Credentials EMPTY = create("", "");
 
     private final String username;
     private final String password;
@@ -14,10 +15,6 @@ public final class Credentials {
     private Credentials(String username, String password) {
         this.username = Objects.requireNonNull(username);
         this.password = Objects.requireNonNull(password);
-    }
-
-    public static Credentials create(String username, String password) {
-        return new Credentials(username, password);
     }
 
     public String getUsername() {
@@ -40,5 +37,17 @@ public final class Credentials {
     @Override
     public int hashCode() {
         return Objects.hash(username, password);
+    }
+
+    @Override
+    public String toString() {
+        return "Credentials{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
+
+    public static Credentials create(String username, String password) {
+        return new Credentials(username, password);
     }
 }

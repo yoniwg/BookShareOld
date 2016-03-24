@@ -4,7 +4,7 @@ package hgyw.com.bookshare.entities;
  * Created by Yoni on 3/15/2016.
  */
 public class BookReview extends Entity{
-    private User user;
+    private Customer customer;
     private Book book;
     private int rating;
     private String title;
@@ -42,11 +42,11 @@ public class BookReview extends Entity{
         this.description = description;
     }
 
-    public User getUser() {
-        return user;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }

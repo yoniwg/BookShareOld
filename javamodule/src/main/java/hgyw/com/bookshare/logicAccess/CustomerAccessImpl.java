@@ -1,11 +1,7 @@
 package hgyw.com.bookshare.logicAccess;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Book;
@@ -13,13 +9,12 @@ import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderRating;
-import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 
 /**
  * Created by haim7 on 20/03/2016.
  */
-public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
+class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     public CustomerAccessImpl(ExpandedCrud crud, User currentUser) {
         super(crud, currentUser);
@@ -32,8 +27,8 @@ public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAcc
 
     @Override
     public void updateCustomerDetails(Customer newDetails) {
-        if (newDetails.getId() != currentUser.getId())
-            throw new IllegalArgumentException("The ID is not compatible with the current user");
+        requireItsMe(newDetails);
+        newDetails.setCredentials(retrieveCustomerDetails().getCredentials()); // Avoid change credentials by this method.
         crud.updateEntity(newDetails);
     }
 
@@ -59,35 +54,38 @@ public class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAcc
 
     @Override
     public void performNewOrder(Order order) {
+        requireItsMe(order.getCustomer());
         // TODO: That's it? Any validation?
         crud.createEntity(order);
     }
 
     @Override
     public void cancelOrder(long orderId) {
+        Order order = crud.retrieveEntity(Order.class, orderId);
+        requireItsMe(order.getCustomer());
         throw new UnsupportedOperationException(); // TODO ?
     }
 
     @Override
     public void updateOrderRating(long orderId, OrderRating orderRating) {
         Order order = crud.retrieveEntity(Order.class, orderId);
+        requireItsMe(order.getCustomer());
         order.setOrderRating(orderRating);
         crud.updateEntity(order);
     }
 
     @Override
     public void writeBookReview(BookReview bookReview) {
-        crud.updateEntity(bookReview);
+        requireItsMe(bookReview.getCustomer());
+        if (bookReview.getId() == 0) crud.createEntity(bookReview);
+        else crud.updateEntity(bookReview);
     }
 
     @Override
     public void removeBookReview(BookReview bookReview) {
+        requireItsMe(crud.retrieveEntity(bookReview).getCustomer());
         crud.deleteEntity(bookReview);
     }
 
-    @Override
-    public Collection<Supplier> retrieveSuppliers(Book book) {
-        return crud.findEntityReferTo(Supplier.class, book);
-    }
 
 }

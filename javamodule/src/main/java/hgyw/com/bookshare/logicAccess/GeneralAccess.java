@@ -1,11 +1,13 @@
 package hgyw.com.bookshare.logicAccess;
 
+import java.util.Collection;
 import java.util.List;
 
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
+import hgyw.com.bookshare.entities.Supplier;
 
 /**
  * Created by Yoni on 3/13/2016.
@@ -14,9 +16,10 @@ public interface GeneralAccess {
 
     //==information==
 
-    List<BookSupplier> findBooks(BookQuery query);
-    List<BookSupplier> findSpecialOffers();
-    List<BookReview> getBookReviews(Book book);
+    Collection<BookSupplier> findBooks(BookQuery query);
+    Collection<BookSupplier> findSpecialOffers();
+    Collection<BookReview> getBookReviews(Book book);
+    Collection<Supplier> retrieveSuppliers(Book book);
 
     Object getCurrentUser();
 

@@ -9,17 +9,19 @@ public class CrudFactory {
 
     private static DatabaseType currentDB = DatabaseType.LISTS;
 
-    private static Crud crud;
+    private static ExpandedCrud crud;
 
+    private CrudFactory() {}
 
     /**
      * @return
      */
-    static public Crud getInstance(){
+    static synchronized public ExpandedCrud getInstance(){
         if (crud == null) {
             switch (currentDB) {
                 case LISTS:
-                    crud = new ListsCrudImpl();
+                    crud = new ExpandedCrudImpl();
+                    new CrudTest(crud).addData();
                     break;
                 case SQL_LITE:
                     //TODO

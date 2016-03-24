@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.Entity;
 import hgyw.com.bookshare.entities.reflection.Property;
 import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
@@ -21,7 +22,7 @@ import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
  */
 class ListsCrudImpl implements Crud {
 
-    //final ListsCrudImpl INSTANCE = new ListsCrudImpl();
+    //static final ListsCrudImpl INSTANCE = new ListsCrudImpl();
     protected ListsCrudImpl() {}
 
     private Map<Class<? extends Entity>, Long> entitiesIdMap = new HashMap<>();
@@ -86,12 +87,17 @@ class ListsCrudImpl implements Crud {
     @Override
     public <T extends Entity> Collection<T> findEntityReferTo(Class<T> referringClass, Entity referredItem) {
         Property p = ReflectionProperties.getPropertyOfType(referringClass, referredItem.getClass());
-        return streamAll(referringClass)
+        return this.streamAll(referringClass)
                 .filter(e -> {
                     try {
                         return p.get(e).equals(referredItem);
-                    } catch (InvocationTargetException | IllegalAccessException e1) { return false; }
+                    } catch (InvocationTargetException ex) { return false; }
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public BookReview retrieveEntity(BookReview bookReview) {
+        return retrieveEntity(bookReview.getClass(), bookReview.getId());
     }
 
 

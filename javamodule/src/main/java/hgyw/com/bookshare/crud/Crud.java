@@ -4,6 +4,7 @@ import com.annimon.stream.Stream;
 
 import java.util.Collection;
 
+import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.Entity;
 
 /**
@@ -59,4 +60,6 @@ public interface Crud {
      * @return
      */
     <T extends Entity> Collection<T> findEntityReferTo(Class<T> referringClass, Entity referredItem);
+
+    BookReview retrieveEntity(BookReview bookReview);
 }

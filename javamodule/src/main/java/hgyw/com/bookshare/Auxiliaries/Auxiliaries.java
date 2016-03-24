@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.entities;
+package hgyw.com.bookshare.Auxiliaries;
 
 /**
  * Created by haim7 on 23/03/2016.

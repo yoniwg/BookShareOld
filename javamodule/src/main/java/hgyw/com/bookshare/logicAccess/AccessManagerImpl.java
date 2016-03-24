@@ -1,5 +1,6 @@
 package hgyw.com.bookshare.logicAccess;
 
+import hgyw.com.bookshare.crud.CrudFactory;
 import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Guest;
@@ -9,18 +10,16 @@ import hgyw.com.bookshare.entities.UserType;
 /**
  * Created by Yoni on 3/13/2016.
  */
-public enum AccessManagerImpl implements AccessManager {
-
+enum  AccessManagerImpl implements AccessManager {
     INSTANCE;
 
-    final private ExpandedCrud crud = new ExpandedCrud();
+    private final User guest = new Guest();
+    private final ExpandedCrud crud = (ExpandedCrud) CrudFactory.getInstance();
     private GeneralAccess currentAccess;
     private User currentUser;
-    private User guest = new Guest();
 
     AccessManagerImpl() {
-        currentUser = guest;
-        switchAccess();
+        switchAccess(guest);
     }
 
 
@@ -37,30 +36,29 @@ public enum AccessManagerImpl implements AccessManager {
     @Override
     public void signIn(Credentials credentials) {
         if (currentUser != guest) throw new IllegalStateException("There has been a user that is signed in.");
-        currentUser = crud.retrieveUserWithCredentials(credentials);
-        if (currentUser == null) throw new RuntimeException("Wrong usenname and password"); // TODO specific exception
-        switchAccess();
+        User newUser = crud.retrieveUserWithCredentials(credentials);
+        if (newUser == null) throw new RuntimeException("Wrong usenname and password"); // TODO specific exception
+        switchAccess(newUser);
     }
 
-    private void switchAccess() {
-        switch (getCurrentUserType()) {
+    private void switchAccess(User newUser) {
+        switch (newUser.userType()) {
             case GUEST:
-                currentAccess = new GeneralAccessImpl(crud, currentUser);
+                currentAccess = new GeneralAccessImpl(crud, newUser);
                 break;
             case CUSTOMER:
-                currentAccess = new CustomerAccessImpl(crud, currentUser);
+                currentAccess = new CustomerAccessImpl(crud, newUser);
                 break;
             case SUPPLIER:
                 //currentAccess = new SupplierAccessImpl(currentUser);
                 break;
         }
-
+        currentUser = newUser;
     }
 
     @Override
     public void signOut() {
-        currentUser = guest;
-        switchAccess();
+        switchAccess(guest);
     }
 
     @Override

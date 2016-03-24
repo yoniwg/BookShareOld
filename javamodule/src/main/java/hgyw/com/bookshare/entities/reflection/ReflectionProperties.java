@@ -2,10 +2,12 @@ package hgyw.com.bookshare.entities.reflection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import hgyw.com.bookshare.entities.Entity;
 
@@ -45,7 +47,7 @@ public class ReflectionProperties extends Reflection {
         for (Property p : getPropertiesMap(clazz).values())
             if (p.getPropertyClass() == propertyType)
                 return p;
-        throw new NoSuchElementException("No property of type " + propertyType.getSimpleName() + " in class " + clazz.getSimpleName());
+        throw new NoSuchElementException("No property of type " + propertyType.getSimpleName() + " reflected in class " + clazz.getSimpleName());
     }
 
     private static class ReflectedProperty implements Property {
@@ -54,18 +56,30 @@ public class ReflectionProperties extends Reflection {
         private final Method getter;
 
         public ReflectedProperty(String name, Method getter, Method setter) {
+            Objects.requireNonNull(name);
+            if (!Modifier.isPublic(getter.getModifiers()) || setter != null && !Modifier.isPublic(setter.getModifiers())) {
+                throw new IllegalArgumentException("The getter and setter should be public.");
+            }
             this.name = name; this.setter = setter; this.getter = getter;
         }
 
         @Override
-        public void set(Object o, Object value) throws InvocationTargetException, IllegalAccessException {
+        public void set(Object o, Object value) throws InvocationTargetException {
             if (setter == null) throw new UnsupportedOperationException("The Property is read only.");
-            setter.invoke(o, value);
+            try {
+                setter.invoke(o, value);
+            } catch (IllegalAccessException e) {
+                throw new InternalError(); // unreached code because the method is public
+            }
         }
 
         @Override
-        public Object get(Object o) throws InvocationTargetException, IllegalAccessException {
-            return getter.invoke(o);
+        public Object get(Object o) throws InvocationTargetException {
+            try {
+                return getter.invoke(o);
+            } catch (IllegalAccessException e) {
+                throw new InternalError(); // unreached code because the method is public
+            }
         }
 
         @Override
