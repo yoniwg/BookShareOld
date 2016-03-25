@@ -68,14 +68,14 @@ class ListsCrudImpl implements Crud {
         }
     }
 
-    public <T extends Entity> Stream<T> streamAll(Class<T> entityType) {
+    public <T extends Entity> Stream<T> streamAll(Class<? extends T> entityType) {
         List<Entity> entityList = entitiesMap.get(entityType);
         if (entityList != null) return Stream.of(entityList).map(e -> (T) e);
         return Stream.empty();
     }
 
     @Override
-    public <T extends Entity> T retrieveEntity(Class<T> entityClass, long id) {
+    public <T extends Entity> T retrieveEntity(Class<? extends T> entityClass, long id) {
         Optional<T> entity = streamAll(entityClass)
                 .filter(e -> e.getId() == id)
                 .findFirst();
@@ -84,7 +84,7 @@ class ListsCrudImpl implements Crud {
     }
 
     @Override
-    public <T extends Entity> Collection<T> findEntityReferTo(Class<T> referringClass, Entity referredItem) {
+    public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity referredItem) {
         Property p = ReflectionProperties.getPropertyOfType(referringClass, referredItem.getClass());
         return this.streamAll(referringClass)
                 .filter(e -> {
@@ -95,8 +95,8 @@ class ListsCrudImpl implements Crud {
     }
 
     @Override
-    public BookReview retrieveEntity(BookReview bookReview) {
-        return retrieveEntity(bookReview.getClass(), bookReview.getId());
+    public <T extends Entity> T retrieveEntity(T item) {
+        return retrieveEntity((Class<? extends T>) item.getClass(), item.getId());
     }
 
 

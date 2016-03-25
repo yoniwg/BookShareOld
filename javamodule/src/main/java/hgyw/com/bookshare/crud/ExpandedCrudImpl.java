@@ -44,7 +44,7 @@ class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
     }
 
     @Override
-    public Collection<Customer> findInterestedInBook(Book book) {
+    public Collection<Customer> findInterestedInBook(Book book, User userAsked) {
         return streamAll(Order.class)
                 .filter(o -> Stream.of(o.getOrderedBooks())
                         .anyMatch(ob -> ob.getBookSupplier().getBook().equals(book)))
@@ -67,9 +67,9 @@ class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
     }
 
     @Override
-    public List<BookSupplier> findSpecialOffers(User currentUser) {
+    public List<BookSupplier> findSpecialOffers(User user) {
         final int TOP_NUMBER = 3;
-        Stream<BookSupplier> listOfBooks = getDistinctBooksOfUser(currentUser);
+        Stream<BookSupplier> listOfBooks = getDistinctBooksOfUser(user);
         List<String> top3Authors = getTopInstances(listOfBooks.map(bs -> bs.getBook().getAuthor()), TOP_NUMBER);
         List<Book.Genre> top3Genre = getTopInstances(listOfBooks.map(bs -> bs.getBook().getGenre()), TOP_NUMBER);
         //find books from top TOP_NUMBER authors and genres

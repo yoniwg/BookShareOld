@@ -3,7 +3,9 @@ package hgyw.com.bookshare.logicAccess;
 import hgyw.com.bookshare.crud.CrudFactory;
 import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Credentials;
+import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Guest;
+import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 import hgyw.com.bookshare.entities.UserType;
 
@@ -24,7 +26,13 @@ enum  AccessManagerImpl implements AccessManager {
 
 
     @Override
+    public boolean isUserNameTaken(String username) {
+        return crud.isUsernameTaken(username);
+    }
+
+    @Override
     public void signUp(User user) {
+        if (!(user instanceof Customer || user instanceof Supplier)) throw new IllegalArgumentException("The user should be instance of Customer or Supplier.");
         if (user.getId() == 0) throw new IllegalArgumentException("New item should have id 0.");
         if (crud.isUsernameTaken(user.getCredentials().getUsername())) {
             throw new RuntimeException("Username and password are taken.");
@@ -37,7 +45,7 @@ enum  AccessManagerImpl implements AccessManager {
     public void signIn(Credentials credentials) {
         if (currentUser != guest) throw new IllegalStateException("There has been a user that is signed in.");
         User newUser = crud.retrieveUserWithCredentials(credentials);
-        if (newUser == null) throw new RuntimeException("Wrong usenname and password"); // TODO specific exception
+        if (newUser == null) throw new RuntimeException("Wrong username and password"); // TODO specific exception
         switchAccess(newUser);
     }
 

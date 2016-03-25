@@ -39,7 +39,7 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public Collection<Customer> findInterestedInBook(Book book) {
-        return crud.findInterestedInBook(book);
+        return crud.findInterestedInBook(book, currentUser);
     }
 
     @Override
