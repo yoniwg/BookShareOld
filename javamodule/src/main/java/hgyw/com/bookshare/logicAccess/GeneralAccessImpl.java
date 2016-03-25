@@ -27,7 +27,7 @@ class GeneralAccessImpl implements GeneralAccess {
     final protected ExpandedCrud crud;
     final protected User currentUser;
 
-    protected <T> void requireItsMe(User user) {
+    protected void requireItsMeForAccess(User user) {
         if (!user.equals(getCurrentUser())) {
             throw new IllegalArgumentException("The current user has not access to manipulate other users.");
         }
@@ -49,10 +49,8 @@ class GeneralAccessImpl implements GeneralAccess {
     }
 
     @Override
-    public List<BookReview> getBookReviews(Book book) {
-        return crud.streamAll(BookReview.class)
-                .filter(br -> br.getBook().equals(book))
-                .collect(Collectors.toList());
+    public Collection<BookReview> getBookReviews(Book book) {
+        return crud.findEntityReferTo(BookReview.class, book);
     }
 
     @Override

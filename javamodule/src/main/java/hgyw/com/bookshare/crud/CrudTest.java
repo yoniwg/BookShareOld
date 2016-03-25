@@ -26,9 +26,9 @@ import hgyw.com.bookshare.entities.User;
  */
 class CrudTest {
 
-    private final Crud crud;
+    private final ListsCrudImpl crud;
 
-    public CrudTest(Crud crud) {
+    public CrudTest(ListsCrudImpl crud) {
         this.crud = crud;
     }
 

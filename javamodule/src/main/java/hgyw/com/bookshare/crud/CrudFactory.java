@@ -21,7 +21,7 @@ public class CrudFactory {
             switch (currentDB) {
                 case LISTS:
                     crud = new ExpandedCrudImpl();
-                    new CrudTest(crud).addData();
+                    new CrudTest((ListsCrudImpl) crud).addData();
                     break;
                 case SQL_LITE:
                     //TODO

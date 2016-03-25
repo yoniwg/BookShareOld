@@ -35,14 +35,6 @@ public interface Crud {
     void deleteEntity(Entity item);
 
     /**
-     * Get a stream of all item of an entity.
-     * @param entityClass The entity class
-     * @param <T> The type of entity
-     * @return Stream of type T contains the items
-     */
-    <T extends Entity> Stream<T> streamAll(Class<T> entityClass);
-
-    /**
      * Retrieve an entity from database.
      * @param entityClass The entity class
      * @param id Item id

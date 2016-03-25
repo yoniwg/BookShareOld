@@ -27,7 +27,7 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public void updateCustomerDetails(Customer newDetails) {
-        requireItsMe(newDetails);
+        requireItsMeForAccess(newDetails);
         newDetails.setCredentials(retrieveCustomerDetails().getCredentials()); // Avoid change credentials by this method.
         crud.updateEntity(newDetails);
     }
@@ -54,7 +54,7 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public void performNewOrder(Order order) {
-        requireItsMe(order.getCustomer());
+        requireItsMeForAccess(order.getCustomer());
         // TODO: That's it? Any validation?
         crud.createEntity(order);
     }
@@ -62,28 +62,28 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
     @Override
     public void cancelOrder(long orderId) {
         Order order = crud.retrieveEntity(Order.class, orderId);
-        requireItsMe(order.getCustomer());
+        requireItsMeForAccess(order.getCustomer());
         throw new UnsupportedOperationException(); // TODO ?
     }
 
     @Override
     public void updateOrderRating(long orderId, OrderRating orderRating) {
         Order order = crud.retrieveEntity(Order.class, orderId);
-        requireItsMe(order.getCustomer());
+        requireItsMeForAccess(order.getCustomer());
         order.setOrderRating(orderRating);
         crud.updateEntity(order);
     }
 
     @Override
     public void writeBookReview(BookReview bookReview) {
-        requireItsMe(bookReview.getCustomer());
+        requireItsMeForAccess(bookReview.getCustomer());
         if (bookReview.getId() == 0) crud.createEntity(bookReview);
         else crud.updateEntity(bookReview);
     }
 
     @Override
     public void removeBookReview(BookReview bookReview) {
-        requireItsMe(crud.retrieveEntity(bookReview).getCustomer());
+        requireItsMeForAccess(crud.retrieveEntity(bookReview).getCustomer());
         crud.deleteEntity(bookReview);
     }
 

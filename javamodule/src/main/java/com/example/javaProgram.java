@@ -5,6 +5,8 @@ import com.annimon.stream.Stream;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
 
 import hgyw.com.bookshare.entities.reflection.Property;
@@ -129,8 +131,6 @@ public class javaProgram {
 
         System.out.println("Customer Reviews: " + cAccess.getCustomerReviews());
         System.out.println("Interested In Book: " + cAccess.findInterestedInBook(getRandomItem(Book.class)));
-        System.out.println("Retrieve Orders: " + cAccess.retrieveOrders(null, null));
-        System.out.println("Retrieve Orders: " + cAccess.retrieveOpenOrders());
 
         System.out.println("** Book Review functions **");
         Book book = getRandomItem(Book.class);
@@ -148,12 +148,21 @@ public class javaProgram {
         cAccess.removeBookReview(newReview);
         System.out.println("These are current book reviews: " + cAccess.getBookReviews(book));
 
-        System.out.println("** Now we have to check only order functions! **");
+        System.out.println("\n** Now we have to check only order functions! **");
+
+        System.out.println("Retrieve Orders: " + cAccess.retrieveOrders(null, null));
+        Date now = new Date(), yesterday = new Date(now.getTime() - 24*60*60);
+        System.out.println("Retrieve Orders today: " + cAccess.retrieveOrders(yesterday, now));
+        System.out.println("Retrieve Orders this moment: " + cAccess.retrieveOrders(now, now));
+        System.out.println("Retrieve Orders open: " + cAccess.retrieveOpenOrders());
+
+
     }
 
     static <T extends Entity> T getRandomItem(Class<T> clazz) {
-        long index = (long) (crud.streamAll(clazz).count() * Math.random());
-        return crud.streamAll(clazz).skip(index).findFirst().orElseThrow(() -> new NoSuchElementException("TESTING MESSAGE: the stream of entity is empty"));
+        //long index = (long) (crud.streamAll(clazz).count() * Math.random());
+        //return crud.streamAll(clazz).skip(index).findFirst().orElseThrow(() -> new NoSuchElementException("TESTING MESSAGE: the stream of entity is empty"));
+        return crud.retrieveEntity(clazz, 1);
     }
 
 }
