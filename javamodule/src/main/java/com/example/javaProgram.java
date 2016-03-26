@@ -3,14 +3,9 @@ package com.example;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.NoSuchElementException;
 
-import hgyw.com.bookshare.entities.reflection.Property;
-import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
 import hgyw.com.bookshare.logicAccess.AccessManager;
 import hgyw.com.bookshare.logicAccess.AccessManagerFactory;
 import hgyw.com.bookshare.logicAccess.CustomerAccess;
@@ -29,6 +24,7 @@ public class javaProgram {
     private static Crud crud;
 
     public static void main(String[] args) {
+
         long startTimeCount = System.currentTimeMillis();
 
         crud = CrudFactory.getInstance();

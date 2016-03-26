@@ -16,7 +16,7 @@ public class Order extends Entity {
     private List<OrderedBook> booksList = new ArrayList<>();
     OrderRating orderRating;
     private Date date = new Date();
-    private boolean open;
+    private boolean open = true;
 
     public Date getDate() {
         return date;

@@ -14,33 +14,50 @@ import hgyw.com.bookshare.entities.Entity;
 /**
  * Created by haim7 on 23/03/2016.
  */
-public class ReflectionProperties extends Reflection {
+public class ReflectionProperties {
 
+    /**
+     * Returns the method name without prefix of "is" for boolean getter, or "get" for boolean and other getters.
+     * If the method name is not match the getter og java binding then it will return null.
+     */
+    private static String removePrefixFromGetter(Method method) {
+        String name = method.getName();
+        boolean methodReturnsBoolean = method.getReturnType() == boolean.class || method.getReturnType() == Boolean.class;
+        if (methodReturnsBoolean && name.startsWith("is") && Character.isUpperCase(name.charAt(2))) {
+            return name.substring(2);
+        }
+        if (name.startsWith("get") && Character.isUpperCase(name.charAt(3))) {
+            return name.substring(3);
+        }
+        return null;
+    }
 
-    public static Collection<Property> getProperties(Class<?> clazz) {
-        return getPropertiesMap(clazz).values();
+    /**
+     * Returns setter that its method name is "set"+setterNameWithoutPrefix, with the propertyType, in class declaringClass.
+     */
+    private static Method getSetter(Class<?> declaringClass, String setterNameWithoutPrefix, Class<?> propertyType) {
+        try {
+            return declaringClass.getMethod("set" + setterNameWithoutPrefix, propertyType);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    public static Map<String, Property> getPropertiesMap(Class<?> clazz) {
+        Map<String, Property> map = new HashMap<>();
+        for (Method m : clazz.getMethods()) {
+            String getterNameWithoutPrefix = removePrefixFromGetter(m);
+            if (getterNameWithoutPrefix != null && !getterNameWithoutPrefix.equals("Class")) {
+                String propertyName = Character.toLowerCase(getterNameWithoutPrefix.charAt(0)) + getterNameWithoutPrefix.substring(1);
+                Property p = new ReflectedProperty(propertyName, m, getSetter(m.getDeclaringClass(), propertyName, m.getReturnType()));
+                map.put(p.getName(), p);
+            }
+        }
+        return map;
     }
 
     public static Property getProperty(Class<?> clazz, String propertyName) {
         return getPropertiesMap(clazz).get(propertyName);
-    }
-
-    private static Map<String, Property> getPropertiesMap(Class<?> clazz) {
-        Map<String, Property> map = new HashMap<>();
-        for (Method m : clazz.getMethods())
-            if (isGetter(m)) {
-                Property p = new ReflectedProperty(propertyNameFromGetter(m), m, getSetterByGetter(m));
-                map.put(p.getName(), p);
-            }
-        return map;
-    }
-
-    private static Method getSetterByGetter(Method m) {
-        try {
-            return m.getDeclaringClass().getMethod("set" + m.getName().substring(3), m.getReturnType());
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
     }
 
     public static <T extends Entity> Property getPropertyOfType(Class<T> clazz, Class<? extends Entity> propertyType) {
@@ -50,17 +67,20 @@ public class ReflectionProperties extends Reflection {
         throw new NoSuchElementException("No property of type " + propertyType.getSimpleName() + " reflected in class " + clazz.getSimpleName());
     }
 
+    /**
+     * Class represents property, that accepts getter and setter of reflection, and property name.
+     * The setter can be null and then the property will be read-only.
+     */
     private static class ReflectedProperty implements Property {
         private final String name;
         private final Method setter;
         private final Method getter;
 
         public ReflectedProperty(String name, Method getter, Method setter) {
-            Objects.requireNonNull(name);
             if (!Modifier.isPublic(getter.getModifiers()) || setter != null && !Modifier.isPublic(setter.getModifiers())) {
                 throw new IllegalArgumentException("The getter and setter should be public.");
             }
-            this.name = name; this.setter = setter; this.getter = getter;
+            this.name = Objects.requireNonNull(name); this.setter = setter; this.getter = getter;
         }
 
         @Override
