@@ -2,7 +2,6 @@ package hgyw.com.bookshare.logicAccess;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Book;
@@ -10,15 +9,17 @@ import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderStatus;
 import hgyw.com.bookshare.entities.Supplier;
-import hgyw.com.bookshare.entities.User;
 
 /**
  * Created by haim7 on 26/03/2016.
  */
 public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAccess {
 
+    final private Supplier currentUser;
+
     public SupplierAccessImpl(ExpandedCrud crud, Supplier currentUser) {
         super(crud, currentUser);
+        this.currentUser = currentUser;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
 
     @Override
     public Supplier retrieveSupplierDetails() {
-        return (Supplier) currentUser;
+        return currentUser;
     }
 
     @Override
@@ -55,18 +56,18 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
 
     @Override
     public Collection<Order> retrieveOrders(Date fromDate, Date toDate) {
-        return crud.retrieveOrders(null, (Supplier) currentUser, fromDate, toDate, false);
+        return crud.retrieveOrders(null, currentUser, fromDate, toDate, false);
     }
 
     @Override
     public Collection<Order> retrieveOpenOrders(Date fromDate, Date toDate) {
-        return crud.retrieveOrders(null, (Supplier) currentUser, fromDate, toDate, true);
+        return crud.retrieveOrders(null, currentUser, fromDate, toDate, true);
     }
 
     @Override
     public void updateOrderStatus(long orderId, OrderStatus orderStatus) {
         Order order = crud.retrieveEntity(Order.class, orderId);
-        requireItsMeForAccess(order.getSupplier());
+        requireItsMeForAccess(order.getBookSupplier().getSupplier());
         order.setOrderStatus(orderStatus);
         crud.updateEntity(order);
     }

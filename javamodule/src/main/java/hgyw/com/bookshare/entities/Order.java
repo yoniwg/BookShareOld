@@ -1,55 +1,49 @@
 package hgyw.com.bookshare.entities;
 
-import com.annimon.stream.Stream;
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Yoni on 3/15/2016.
  */
 public class Order extends Entity {
-
-    private Customer customer;
-    private Supplier supplier;
-    private List<OrderedBook> booksList = new ArrayList<>();
+    private BookSupplier bookSupplier;
+    private int amount = 1;
+    private BigDecimal unitPrice = BigDecimal.ZERO;
     private OrderRating orderRating = new OrderRating();
-    private OrderStatus orderStatus = new OrderStatus();
-    private Date date = new Date();
-    private boolean open = true;
+    private OrderStatus orderStatus = OrderStatus.NEW;
+    private Transaction transaction;
 
-    public Date getDate() {
-        return date;
+    
+    public int getAmount() {
+        return amount;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 
-    BigDecimal calcTotalPrice() {
-        return Stream.of(booksList).map(OrderedBook::calcTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void computePriceByBookSupplier() {
+        unitPrice = bookSupplier.getPrice();
     }
 
-    public List<OrderedBook> getOrderedBooks() {
-        return booksList;
+    public BigDecimal calcTotalPrice() {
+        return getUnitPrice().multiply(BigDecimal.valueOf(getAmount()));
     }
 
-    public boolean isOpen() {
-        return open;
+    public BookSupplier getBookSupplier() {
+        return bookSupplier;
     }
 
-    public void setOpen(boolean open) {
-        this.open = open;
+    public void setBookSupplier(BookSupplier bookSupplier) {
+        this.bookSupplier = bookSupplier;
     }
 
     public OrderRating getOrderRating() {
@@ -60,19 +54,19 @@ public class Order extends Entity {
         this.orderRating = orderRating;
     }
 
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
-    }
-
     public OrderStatus getOrderStatus() {
         return orderStatus;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 }

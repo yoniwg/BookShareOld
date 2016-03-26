@@ -9,16 +9,20 @@ import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderRating;
-import hgyw.com.bookshare.entities.Supplier;
-import hgyw.com.bookshare.entities.User;
+import hgyw.com.bookshare.entities.OrderStatus;
+import hgyw.com.bookshare.entities.Transaction;
+import hgyw.com.bookshare.exceptions.NewTransactionException;
 
 /**
  * Created by haim7 on 20/03/2016.
  */
 class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
-    public CustomerAccessImpl(ExpandedCrud crud, User currentUser) {
+    final private Customer currentUser;
+
+    public CustomerAccessImpl(ExpandedCrud crud, Customer currentUser) {
         super(crud, currentUser);
+        this.currentUser = currentUser;
     }
 
     @Override
@@ -45,32 +49,52 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public Collection<Order> retrieveOrders(Date fromDate, Date toDate) {
-        return crud.retrieveOrders((Customer)currentUser, null, fromDate, toDate, false);
+        return crud.retrieveOrders(currentUser, null, fromDate, toDate, false);
     }
 
     @Override
     public Collection<Order> retrieveOpenOrders() {
-        return crud.retrieveOrders((Customer)currentUser, null, null, null, true);
+        return crud.retrieveOrders(currentUser, null, null, null, true);
     }
 
     @Override
-    public void performNewOrder(Order order) {
-        requireItsMeForAccess(order.getCustomer());
-        // TODO: That's it? Any validation?
-        crud.createEntity(order);
+    public void performNewTransaction(Transaction transaction, Collection<Order> orders) throws NewTransactionException {
+        requireItsMeForAccess(transaction.getCustomer());
+        validateOrdersDetails(orders);
+        for (Order o : orders) {
+            o.setId(0);
+            o.computePriceByBookSupplier();
+            o.setOrderStatus(OrderStatus.NEW);
+            o.setTransaction(transaction);
+            crud.createEntity(o);
+        }
+        transaction.setDate(new Date());
+        crud.createEntity(transaction);
+
+    }
+
+    private void validateOrdersDetails(Collection<Order> orders) throws NewTransactionException {
+        for (Order o : orders) {
+            if (o.getBookSupplier().getPrice().equals(crud.retrieveEntity(o.getBookSupplier()).getPrice())) {
+                throw new NewTransactionException(NewTransactionException.Issue.PRICE_NOT_MATCH, o);
+            }
+            if (o.getBookSupplier().getAmountAvailable() <= 0) {
+                throw new NewTransactionException(NewTransactionException.Issue.NOT_AVAILABLE, o);
+            }
+        }
     }
 
     @Override
     public void cancelOrder(long orderId) {
         Order order = crud.retrieveEntity(Order.class, orderId);
-        requireItsMeForAccess(order.getCustomer());
+        requireItsMeForAccess(order.getTransaction().getCustomer());
         throw new UnsupportedOperationException(); // TODO ?
     }
 
     @Override
     public void updateOrderRating(long orderId, OrderRating orderRating) {
         Order order = crud.retrieveEntity(Order.class, orderId);
-        requireItsMeForAccess(order.getCustomer());
+        requireItsMeForAccess(order.getTransaction().getCustomer());
         order.setOrderRating(orderRating);
         crud.updateEntity(order);
     }

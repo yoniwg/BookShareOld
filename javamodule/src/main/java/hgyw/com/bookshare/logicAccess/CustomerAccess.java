@@ -9,7 +9,8 @@ import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderRating;
-import hgyw.com.bookshare.entities.Supplier;
+import hgyw.com.bookshare.entities.Transaction;
+import hgyw.com.bookshare.exceptions.NewTransactionException;
 
 /**
  * Created by Yoni on 3/13/2016.
@@ -24,7 +25,7 @@ public interface CustomerAccess extends GeneralAccess {
     Collection<Order> retrieveOrders(Date fromDate, Date toDate);
     Collection<Order> retrieveOpenOrders();
 
-    void performNewOrder(Order order);
+    void performNewTransaction(Transaction transaction, Collection<Order> orders) throws NewTransactionException;
     void cancelOrder(long orderId);
     void updateOrderRating(long orderId, OrderRating orderRating);
 

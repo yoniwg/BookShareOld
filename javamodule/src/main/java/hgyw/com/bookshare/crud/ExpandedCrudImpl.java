@@ -3,7 +3,6 @@ package hgyw.com.bookshare.crud;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,8 +16,9 @@ import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
-import hgyw.com.bookshare.entities.OrderedBook;
+import hgyw.com.bookshare.entities.OrderStatus;
 import hgyw.com.bookshare.entities.Supplier;
+import hgyw.com.bookshare.entities.Transaction;
 import hgyw.com.bookshare.entities.User;
 
 /**
@@ -46,19 +46,19 @@ class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
     @Override
     public Collection<Customer> findInterestedInBook(Book book, User userAsked) {
         return streamAll(Order.class)
-                .filter(o -> Stream.of(o.getOrderedBooks())
-                        .anyMatch(ob -> ob.getBookSupplier().getBook().equals(book)))
-                .map(Order::getCustomer)
+                .filter(o -> o.getBookSupplier().getBook().equals(book))
+                .map(Order::getTransaction)
+                .map(Transaction::getCustomer)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Collection<Order> retrieveOrders(Customer customer, Supplier supplier, Date fromDate, Date toDate, boolean onlyOpen) {
         return streamAll(Order.class)
-                .filter(o -> (customer==null || o.getCustomer().equals(customer))
-                                && (supplier==null || o.getSupplier().equals(supplier))
-                                && Auxiliaries.isBetween(o.getDate(), fromDate, toDate)
-                                && (!onlyOpen || o.isOpen())
+                .filter(o -> (customer == null || o.getTransaction().getCustomer().equals(customer))
+                        && (supplier == null || o.getBookSupplier().equals(supplier))
+                        && Auxiliaries.isBetween(o.getTransaction().getDate(), fromDate, toDate)
+                        && (!onlyOpen || o.getOrderStatus() != OrderStatus.CLOSED)
                 ).collect(Collectors.toList());
     }
 
@@ -68,44 +68,37 @@ class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
     }
 
     @Override
-    public List<BookSupplier> findSpecialOffers(User user) {
-        final int TOP_NUMBER = 3;
+    public List<BookSupplier> findSpecialOffers(User user, int limit) {
         Stream<BookSupplier> listOfBooks = getDistinctBooksOfUser(user);
-        List<String> top3Authors = getTopInstances(listOfBooks.map(bs -> bs.getBook().getAuthor()), TOP_NUMBER);
-        List<Book.Genre> top3Genre = getTopInstances(listOfBooks.map(bs -> bs.getBook().getGenre()), TOP_NUMBER);
-        //find books from top TOP_NUMBER authors and genres
-        Stream<BookSupplier> specialOffers = Stream.of(new ArrayList());
-        for (int i = 0; i < TOP_NUMBER; i++){
-            BookQuery authorBQ = new BookQuery();
-            authorBQ.setAuthorQuery(top3Authors.get(i));
-            specialOffers = Stream.concat(specialOffers, Stream.of(findBooks(authorBQ)));
-            BookQuery genreBQ = new BookQuery();
-            genreBQ.setGenreQuery(top3Genre.get(i));
-            specialOffers = Stream.concat(specialOffers, Stream.of(findBooks(genreBQ)));
-        }
-        return specialOffers.distinct().collect(Collectors.toList());
+        List<String> topAuthors = getTopInstances(listOfBooks.map(bs -> bs.getBook().getAuthor()), limit);
+        List<Book.Genre> topGenre = getTopInstances(listOfBooks.map(bs -> bs.getBook().getGenre()), limit);
+        //find books from top authors and genres
+        return streamAll(BookSupplier.class)
+                //sort by author or genre - give high priority to author & genre fitness
+                .sortBy(bs ->
+                        - (topAuthors.contains(bs.getBook().getAuthor()) ? 1 : 0)
+                        - (topGenre.contains(bs.getBook().getGenre()) ? 1 : 0))
+                .limit(limit)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private Stream<BookSupplier> getDistinctBooksOfUser(User currentUser) {
-        Stream<List<OrderedBook>> listsOfOrderedBooks = streamAll(Order.class).filter(o -> o.getCustomer() == currentUser).map(Order::getOrderedBooks);
-        Stream<Book> StreamOfBooks = Stream.of(new ArrayList<Book>());
-        for (List<OrderedBook> lob: listsOfOrderedBooks.collect(Collectors.toList())){
-            StreamOfBooks = Stream.concat(StreamOfBooks, Stream.of(lob).map(OrderedBook::getBookSupplier).map(BookSupplier::getBook));
-        }
-        List<Book> listOfBooks = StreamOfBooks.distinct().collect(Collectors.toList());
-        return streamAll(BookSupplier.class).filter(bs -> listOfBooks.contains(bs.getBook()));
+        return streamAll(Order.class)
+                .filter(o -> o.getTransaction().getCustomer().equals(currentUser))
+                .map(Order::getBookSupplier)
+                .distinct();
     }
 
     private <T> List<T> getTopInstances(Stream<T> stream, int amount){
-        Map<T, Integer> map = new HashMap();
+        Map<T, Integer> map = new HashMap<>();
         for (T t: stream.collect(Collectors.toList())) {
             Integer oldValue = map.get(t);
             map.put(t, (oldValue == null) ? 1 : oldValue + 1);
         }
         return Stream.of(map)
-                .sortBy(e -> e.getValue())
-                .map(e -> e.getKey()).collect(Collectors.toList())
-                .subList(0, amount);
+                .sortBy(Map.Entry::getValue)
+                .map(Map.Entry::getKey).limit(amount).collect(Collectors.toList());
     }
 
 

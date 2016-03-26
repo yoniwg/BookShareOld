@@ -4,9 +4,12 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
 import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.NoSuchElementException;
 
+import hgyw.com.bookshare.exceptions.NewTransactionException;
 import hgyw.com.bookshare.logicAccess.*;
 import hgyw.com.bookshare.crud.*;
 import hgyw.com.bookshare.entities.*;
@@ -45,7 +48,7 @@ public class javaProgram {
             cloned = (Order) first.clone();
             System.out.println("First: " + first);
             System.out.println("Cloned: " + cloned);
-            System.out.println("References equation of Order.getCustomer(): " + (first.getCustomer() == cloned.getCustomer()));
+            System.out.println("References equation of Order.getCustomer(): " + (first.getTransaction().getCustomer() == cloned.getTransaction().getCustomer()));
             System.out.println("But the items in orderedBooks list has the same references...");
 
             System.out.println("*****************************************************\n");
@@ -71,8 +74,8 @@ public class javaProgram {
         System.out.println("This is a book: " + book);
 
         try {
-            System.out.println("$$$ findSpecialOffers: " + access.findSpecialOffers());
-        } catch (Exception ex) { System.out.println("$$$ " + ex.getClass() + ": " + ex.getMessage()); }
+            System.out.println("$$$ findSpecialOffers: " + access.findSpecialOffers(5));
+        } catch (Exception ex) { ex.printStackTrace(); }
 
         CustomerAccess cAccess;
 
@@ -115,14 +118,14 @@ public class javaProgram {
         System.out.println("\n*** Customer access check: ***");
         cAccess = manager.getCustomerAccess();
 
-        Customer customerDetails = cAccess.retrieveCustomerDetails();
-        System.out.println("current Customer Details: " + customerDetails);
+        Customer customer = cAccess.retrieveCustomerDetails();
+        System.out.println("current Customer Details: " + customer);
         System.out.println("Customer Details Changing...");
-        customerDetails.setFirstName("new");
-        customerDetails.setLastName("name");
-        customerDetails.setCredentials(Credentials.create("new", "credentials"));
-        cAccess.updateCustomerDetails(customerDetails);
-        System.out.println("current Customer Details: " + customerDetails);
+        customer.setFirstName("new");
+        customer.setLastName("name");
+        customer.setCredentials(Credentials.create("new", "credentials"));
+        cAccess.updateCustomerDetails(customer);
+        System.out.println("current Customer Details: " + customer);
 
         System.out.println("Customer Reviews: " + cAccess.getCustomerReviews());
         System.out.println("Interested In Book: " + cAccess.findInterestedInBook(getRandomItem(Book.class)));
@@ -142,11 +145,26 @@ public class javaProgram {
         System.out.println("These are current book reviews: " + cAccess.getBookReviews(book));
 
         try {
-            System.out.println("$$$ findSpecialOffers: " + cAccess.findSpecialOffers());
+            System.out.println("$$$ findSpecialOffers: " + cAccess.findSpecialOffers(5));
             System.out.println("$$$ findInterestedInBook: " + cAccess.findInterestedInBook(book));
         } catch (Exception ex) { System.out.println("$$$ " + ex.getClass() + ": " + ex.getMessage()); }
 
         System.out.println("\n** Now we have to check only order functions! **");
+
+        Transaction transaction = new Transaction();
+        transaction.setCustomer(customer);
+        List<Order> orderList = new ArrayList<>();
+        for (int i = 0; i < 10; i++ ) {
+            Order order = new Order();
+            order.setBookSupplier(getRandomItem(BookSupplier.class));
+            order.computePriceByBookSupplier();
+            orderList.add(order);
+        }
+        try {
+            cAccess.performNewTransaction(transaction, orderList);
+        } catch (NewTransactionException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("Retrieve Orders: " + cAccess.retrieveOrders(null, null));
         Date now = new Date(), yesterday = new Date(now.getTime() - 24*60*60);

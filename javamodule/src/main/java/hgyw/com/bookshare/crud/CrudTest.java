@@ -17,8 +17,10 @@ import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Entity;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderRating;
-import hgyw.com.bookshare.entities.OrderedBook;
+import hgyw.com.bookshare.entities.OrderStatus;
+import hgyw.com.bookshare.entities.Rating;
 import hgyw.com.bookshare.entities.Supplier;
+import hgyw.com.bookshare.entities.Transaction;
 import hgyw.com.bookshare.entities.User;
 
 /**
@@ -150,7 +152,7 @@ class CrudTest {
                 br.setBook(crud.retrieveEntity(Book.class, i));
                 br.setTitle(generateRandomString(10));
                 br.setDescription(generateRandomString(5));
-                br.setRating((int) (Math.random() * 5));
+                br.setRating(Rating.values()[(int) (Math.random() * 5)]);
                 br.setCustomer(getRandomItem(Customer.class));
                 crud.createEntity(br);
             }
@@ -159,21 +161,27 @@ class CrudTest {
 
         // ****************************************************** //
 
-        Order order = new Order();
-        OrderedBook ob;
+        Order order;
+        Transaction transaction = new Transaction();
 
-        order.setId(0);
-        order.setDate(new GregorianCalendar(2016, Calendar.JUNE, 12).getTime());
-        order.setOrderRating(new OrderRating());
-        order.setCustomer(getRandomItem(Customer.class));
-        ob = new OrderedBook();
-        ob.setBookSupplier(getRandomItem(BookSupplier.class));
-        order.getOrderedBooks().add(ob);
-        ob = new OrderedBook();
-        ob.setBookSupplier(getRandomItem(BookSupplier.class));
-        order.getOrderedBooks().add(ob);
-        for (OrderedBook orderedBook : order.getOrderedBooks()) orderedBook.computePriceByBookSupplier();
-        crud.createEntity(order);
+        transaction.setId(0);
+        transaction.setDate(new GregorianCalendar(2016, Calendar.JUNE, 12).getTime());
+        transaction.setCustomer(getRandomItem(Customer.class));
+        for (int i =0; i < 10; i++) {
+            order =  new Order();
+            order.setBookSupplier(getRandomItem(BookSupplier.class));
+            order.setTransaction(transaction);
+            order.setOrderStatus(OrderStatus.values()[((int) (Math.random() * OrderStatus.values().length))]);
+            OrderRating or = new OrderRating();
+            or.setCommunication(Rating.values()[((int) (Math.random() * Rating.values().length))]);
+            or.setItemAsDescribed(Rating.values()[((int) (Math.random() * Rating.values().length))]);
+            or.setShippingTime(Rating.values()[((int) (Math.random() * Rating.values().length))]);
+            order.setOrderRating(or);
+            order.setAmount((int) (1 + Math.random() * 10));
+            order.computePriceByBookSupplier();
+            crud.createEntity(order);
+        }
+        crud.createEntity(transaction);
 
         // ****************************************************** //
 

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.Entity;
 import hgyw.com.bookshare.entities.reflection.Property;
 import hgyw.com.bookshare.entities.reflection.ReflectionProperties;

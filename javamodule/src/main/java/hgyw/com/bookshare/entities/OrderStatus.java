@@ -3,22 +3,8 @@ package hgyw.com.bookshare.entities;
 /**
  * Created by haim7 on 26/03/2016.
  */
-public class OrderStatus {
+public enum  OrderStatus {
 
-    private boolean sent;
+    NEW, WAITING_FOR_PAYING, SENT, CLOSED
 
-    public boolean isSent() {
-        return sent;
-    }
-
-    public void setSent(boolean sent) {
-        this.sent = sent;
-    }
-
-    @Override
-    public String toString() {
-        return "OrderStatus{" +
-                "sent=" + sent +
-                '}';
-    }
 }

@@ -6,7 +6,7 @@ package hgyw.com.bookshare.entities;
 public class BookReview extends Entity{
     private Customer customer;
     private Book book;
-    private int rating;
+    private Rating rating;
     private String title;
     private String description;
 
@@ -18,11 +18,11 @@ public class BookReview extends Entity{
         this.book = book;
     }
 
-    public int getRating() {
+    public Rating getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(Rating rating) {
         this.rating = rating;
     }
 

@@ -11,6 +11,7 @@ public class BookSupplier extends Entity {
     private BigDecimal price = BigDecimal.ZERO;
     private int amountAvailable = 100;
 
+
     public int getAmountAvailable() {
         return amountAvailable;
     }

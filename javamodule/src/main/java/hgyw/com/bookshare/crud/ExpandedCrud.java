@@ -2,7 +2,6 @@ package hgyw.com.bookshare.crud;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
@@ -61,8 +60,9 @@ public interface ExpandedCrud extends Crud {
     /**
      * Find special offers to specified user.
       * @param user The user.
+     * @param limit
      * @return Collection of BookSupplier's.
      */
-    Collection<BookSupplier> findSpecialOffers(User user);
+    Collection<BookSupplier> findSpecialOffers(User user, int limit);
 
 }

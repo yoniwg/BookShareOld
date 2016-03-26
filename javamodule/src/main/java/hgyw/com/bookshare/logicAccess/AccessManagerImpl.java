@@ -55,10 +55,10 @@ enum  AccessManagerImpl implements AccessManager {
                 currentAccess = new GeneralAccessImpl(crud, newUser);
                 break;
             case CUSTOMER:
-                currentAccess = new CustomerAccessImpl(crud, newUser);
+                currentAccess = new CustomerAccessImpl(crud, (Customer) newUser);
                 break;
             case SUPPLIER:
-                //currentAccess = new SupplierAccessImpl(currentUser);
+                currentAccess = new SupplierAccessImpl(crud, (Supplier) newUser);
                 break;
         }
         currentUser = newUser;

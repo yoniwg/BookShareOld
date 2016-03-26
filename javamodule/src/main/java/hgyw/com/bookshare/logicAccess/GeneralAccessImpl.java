@@ -1,21 +1,12 @@
 package hgyw.com.bookshare.logicAccess;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
-import hgyw.com.bookshare.entities.Order;
-import hgyw.com.bookshare.entities.OrderedBook;
 import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 
@@ -25,7 +16,7 @@ import hgyw.com.bookshare.entities.User;
 class GeneralAccessImpl implements GeneralAccess {
 
     final protected ExpandedCrud crud;
-    final protected User currentUser;
+    final private User currentUser;
 
     protected void requireItsMeForAccess(User user) {
         if (!user.equals(getCurrentUser())) {
@@ -44,8 +35,8 @@ class GeneralAccessImpl implements GeneralAccess {
     }
 
     @Override
-    public Collection<BookSupplier> findSpecialOffers() {
-        return crud.findSpecialOffers(currentUser);
+    public Collection<BookSupplier> findSpecialOffers(int limit) {
+        return crud.findSpecialOffers(currentUser, limit);
     }
 
     @Override
