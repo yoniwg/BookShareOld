@@ -9,6 +9,7 @@ import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderRating;
+import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 
 /**
@@ -44,12 +45,12 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public Collection<Order> retrieveOrders(Date fromDate, Date toDate) {
-        return crud.retrieveOrders((Customer)currentUser, fromDate, toDate, false);
+        return crud.retrieveOrders((Customer)currentUser, null, fromDate, toDate, false);
     }
 
     @Override
     public Collection<Order> retrieveOpenOrders() {
-        return crud.retrieveOrders((Customer)currentUser, null, null, true);
+        return crud.retrieveOrders((Customer)currentUser, null, null, null, true);
     }
 
     @Override

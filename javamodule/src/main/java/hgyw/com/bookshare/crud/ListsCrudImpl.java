@@ -86,10 +86,14 @@ class ListsCrudImpl implements Crud {
     @Override
     public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity referredItem) {
         Property p = ReflectionProperties.getPropertyOfType(referringClass, referredItem.getClass());
-        return this.streamAll(referringClass)
+        return findEntityByProperty(p, referredItem);
+    }
+
+    protected <T extends Entity> Collection<T> findEntityByProperty(Property p, Object propertyValue) {
+        return this.streamAll((Class<? extends T>) p.getReflectedClass())
                 .filter(e -> {
                     try {
-                        return p.get(e).equals(referredItem);
+                        return p.get(e).equals(propertyValue);
                     } catch (InvocationTargetException ex) { return false; }
                 }).collect(Collectors.toList());
     }

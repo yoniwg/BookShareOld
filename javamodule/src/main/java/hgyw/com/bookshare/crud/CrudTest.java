@@ -30,6 +30,8 @@ class CrudTest {
 
     public CrudTest(ListsCrudImpl crud) {
         this.crud = crud;
+        addData();
+        printWholeDatabase();
     }
 
     private void printWholeDatabase() {
@@ -45,7 +47,7 @@ class CrudTest {
         );
     }
 
-    void addData() {
+    private void addData() {
 
         // ****************************************************** //
 

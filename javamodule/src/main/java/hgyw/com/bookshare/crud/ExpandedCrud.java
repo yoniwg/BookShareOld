@@ -10,6 +10,7 @@ import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
+import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 
 /**
@@ -41,14 +42,14 @@ public interface ExpandedCrud extends Crud {
     Collection<Customer> findInterestedInBook(Book book, User userAsked);
 
     /**
-     * Retrive orders according to parameters are provided.
+     * Retrieve orders according to parameters are provided.
      * @param customer customer whose orders we wants.
-     * @param fromDate Start date. null for ever.
+     * @param supplier
+     *@param fromDate Start date. null for ever.
      * @param toDate End date. null for ever.
-     * @param onlyOpen boolean value that indicates whether to retrieve only open orders.
-     * @return Collection of thw results.
+     * @param onlyOpen boolean value that indicates whether to retrieve only open orders.    @return Collection of thw results.
      */
-    Collection<Order> retrieveOrders(Customer customer, Date fromDate, Date toDate, boolean onlyOpen);
+    Collection<Order> retrieveOrders(Customer customer, Supplier supplier, Date fromDate, Date toDate, boolean onlyOpen);
 
     /**
      * Find books by book query.

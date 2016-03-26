@@ -53,9 +53,10 @@ class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
     }
 
     @Override
-    public Collection<Order> retrieveOrders(Customer customer, Date fromDate, Date toDate, boolean onlyOpen) {
+    public Collection<Order> retrieveOrders(Customer customer, Supplier supplier, Date fromDate, Date toDate, boolean onlyOpen) {
         return streamAll(Order.class)
-                .filter(o -> o.getCustomer().equals(customer)
+                .filter(o -> (customer==null || o.getCustomer().equals(customer))
+                                && (supplier==null || o.getSupplier().equals(supplier))
                                 && Auxiliaries.isBetween(o.getDate(), fromDate, toDate)
                                 && (!onlyOpen || o.isOpen())
                 ).collect(Collectors.toList());

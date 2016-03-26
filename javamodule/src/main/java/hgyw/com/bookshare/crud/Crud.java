@@ -60,4 +60,6 @@ public interface Crud {
      * @throws java.util.NoSuchElementException If database doesn't contain item of this entity and id.
      */
     <T extends Entity> T retrieveEntity(T item);
+
+    <T extends Entity> Stream<T> streamAll(Class<? extends T> entityType);
 }

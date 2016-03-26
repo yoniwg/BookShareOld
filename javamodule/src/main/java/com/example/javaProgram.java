@@ -5,19 +5,11 @@ import com.annimon.stream.Stream;
 
 import java.lang.reflect.Member;
 import java.util.Date;
+import java.util.NoSuchElementException;
 
-import hgyw.com.bookshare.logicAccess.AccessManager;
-import hgyw.com.bookshare.logicAccess.AccessManagerFactory;
-import hgyw.com.bookshare.logicAccess.CustomerAccess;
-import hgyw.com.bookshare.logicAccess.GeneralAccess;
-import hgyw.com.bookshare.crud.Crud;
-import hgyw.com.bookshare.crud.CrudFactory;
-import hgyw.com.bookshare.entities.Book;
-import hgyw.com.bookshare.entities.BookReview;
-import hgyw.com.bookshare.entities.Credentials;
-import hgyw.com.bookshare.entities.Customer;
-import hgyw.com.bookshare.entities.Entity;
-import hgyw.com.bookshare.entities.Order;
+import hgyw.com.bookshare.logicAccess.*;
+import hgyw.com.bookshare.crud.*;
+import hgyw.com.bookshare.entities.*;
 
 public class javaProgram {
 
@@ -75,6 +67,13 @@ public class javaProgram {
 
         System.out.println("Book Reviews: " + access.getBookReviews(getRandomItem(Book.class)));
 
+        Book book = getRandomItem(Book.class);//crud.retrieveEntity(Book.class, 2);
+        System.out.println("This is a book: " + book);
+
+        try {
+            System.out.println("$$$ findSpecialOffers: " + access.findSpecialOffers());
+        } catch (Exception ex) { System.out.println("$$$ " + ex.getClass() + ": " + ex.getMessage()); }
+
         CustomerAccess cAccess;
 
         // Signing:
@@ -129,8 +128,6 @@ public class javaProgram {
         System.out.println("Interested In Book: " + cAccess.findInterestedInBook(getRandomItem(Book.class)));
 
         System.out.println("** Book Review functions **");
-        Book book = getRandomItem(Book.class);
-        System.out.println("This is a book: " + book);
         System.out.println("These are current book reviews: " + cAccess.getBookReviews(book));
         BookReview newReview = new BookReview();
         newReview.setCustomer((Customer) cAccess.getCurrentUser());
@@ -144,6 +141,11 @@ public class javaProgram {
         cAccess.removeBookReview(newReview);
         System.out.println("These are current book reviews: " + cAccess.getBookReviews(book));
 
+        try {
+            System.out.println("$$$ findSpecialOffers: " + cAccess.findSpecialOffers());
+            System.out.println("$$$ findInterestedInBook: " + cAccess.findInterestedInBook(book));
+        } catch (Exception ex) { System.out.println("$$$ " + ex.getClass() + ": " + ex.getMessage()); }
+
         System.out.println("\n** Now we have to check only order functions! **");
 
         System.out.println("Retrieve Orders: " + cAccess.retrieveOrders(null, null));
@@ -156,9 +158,9 @@ public class javaProgram {
     }
 
     static <T extends Entity> T getRandomItem(Class<T> clazz) {
-        //long index = (long) (crud.streamAll(clazz).count() * Math.random());
-        //return crud.streamAll(clazz).skip(index).findFirst().orElseThrow(() -> new NoSuchElementException("TESTING MESSAGE: the stream of entity is empty"));
-        return crud.retrieveEntity(clazz, 1);
+        long index = (long) (crud.streamAll(clazz).count() * Math.random());
+        return crud.streamAll(clazz).skip(index).findFirst().orElseThrow(() -> new NoSuchElementException("TESTING MESSAGE: the stream of entity is empty"));
+        //return crud.retrieveEntity(clazz, 1);
     }
 
 }

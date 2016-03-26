@@ -13,8 +13,10 @@ import java.util.List;
 public class Order extends Entity {
 
     private Customer customer;
+    private Supplier supplier;
     private List<OrderedBook> booksList = new ArrayList<>();
-    OrderRating orderRating;
+    private OrderRating orderRating = new OrderRating();
+    private OrderStatus orderStatus = new OrderStatus();
     private Date date = new Date();
     private boolean open = true;
 
@@ -56,5 +58,21 @@ public class Order extends Entity {
 
     public void setOrderRating(OrderRating orderRating) {
         this.orderRating = orderRating;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }
