@@ -5,6 +5,7 @@ import com.annimon.stream.Collectors;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,8 +39,9 @@ class CrudTest {
 
     private void printWholeDatabase() {
         final List<Class<? extends Entity>> classes = Arrays.asList(
-                Customer.class, Supplier.class, Order.class, Book.class,
-                BookSupplier.class, BookReview.class
+                Customer.class, Supplier.class, Book.class,
+                BookSupplier.class, Order.class, Transaction.class, BookReview.class
+
         );
 
         System.out.println("\n **************** Database Summury ***************");
@@ -164,24 +166,26 @@ class CrudTest {
         Order order;
         Transaction transaction = new Transaction();
 
-        transaction.setId(0);
-        transaction.setDate(new GregorianCalendar(2016, Calendar.JUNE, 12).getTime());
-        transaction.setCustomer(getRandomItem(Customer.class));
-        for (int i =0; i < 10; i++) {
-            order =  new Order();
-            order.setBookSupplier(getRandomItem(BookSupplier.class));
-            order.setTransaction(transaction);
-            order.setOrderStatus(OrderStatus.values()[((int) (Math.random() * OrderStatus.values().length))]);
-            OrderRating or = new OrderRating();
-            or.setCommunication(Rating.values()[((int) (Math.random() * Rating.values().length))]);
-            or.setItemAsDescribed(Rating.values()[((int) (Math.random() * Rating.values().length))]);
-            or.setShippingTime(Rating.values()[((int) (Math.random() * Rating.values().length))]);
-            order.setOrderRating(or);
-            order.setAmount((int) (1 + Math.random() * 10));
-            order.computePriceByBookSupplier();
-            crud.createEntity(order);
+        for (int j=0; j < 6; j++) {
+            transaction.setId(0);
+            transaction.setDate(getRandomDate(-4, -2));
+            transaction.setCustomer(getRandomItem(Customer.class));
+            for (int i = 0; i < 3; i++) {
+                order = new Order();
+                order.setBookSupplier(getRandomItem(BookSupplier.class));
+                order.setTransaction(transaction);
+                order.setOrderStatus(OrderStatus.values()[((int) (Math.random() * OrderStatus.values().length))]);
+                OrderRating or = new OrderRating();
+                or.setCommunication(Rating.values()[((int) (Math.random() * Rating.values().length))]);
+                or.setItemAsDescribed(Rating.values()[((int) (Math.random() * Rating.values().length))]);
+                or.setShippingTime(Rating.values()[((int) (Math.random() * Rating.values().length))]);
+                order.setOrderRating(or);
+                order.setAmount((int) (1 + Math.random() * 10));
+                order.computePriceByBookSupplier();
+                crud.createEntity(order);
+            }
+            crud.createEntity(transaction);
         }
-        crud.createEntity(transaction);
 
         // ****************************************************** //
 
@@ -212,6 +216,10 @@ class CrudTest {
             }
         }
         return str.toString().trim();
+    }
+
+    private Date getRandomDate(double fromDays, double toDays) {
+        return new Date(System.currentTimeMillis() + (long)( 24*60*60* (fromDays +  (toDays - fromDays)*Math.random())));
     }
 
 

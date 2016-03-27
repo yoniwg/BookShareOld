@@ -1,6 +1,7 @@
 package hgyw.com.bookshare.entities;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Created by Yoni on 3/15/2016.
@@ -33,7 +34,7 @@ public class BookSupplier extends Entity {
     }
 
     public void setPrice(BigDecimal price) {
-        this.price = price;
+        this.price = price.setScale(3, RoundingMode.HALF_UP);
     }
 
     public Supplier getSupplier() {

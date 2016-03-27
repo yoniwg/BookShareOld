@@ -147,7 +147,7 @@ public class javaProgram {
         try {
             System.out.println("$$$ findSpecialOffers: " + cAccess.findSpecialOffers(5));
             System.out.println("$$$ findInterestedInBook: " + cAccess.findInterestedInBook(book));
-        } catch (Exception ex) { System.out.println("$$$ " + ex.getClass() + ": " + ex.getMessage()); }
+        } catch (Exception ex) { ex.printStackTrace(); }
 
         System.out.println("\n** Now we have to check only order functions! **");
 

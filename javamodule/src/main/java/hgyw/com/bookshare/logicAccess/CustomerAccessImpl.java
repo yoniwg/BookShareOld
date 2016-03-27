@@ -6,6 +6,7 @@ import java.util.Date;
 import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookReview;
+import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderRating;
@@ -63,7 +64,6 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
         validateOrdersDetails(orders);
         for (Order o : orders) {
             o.setId(0);
-            o.computePriceByBookSupplier();
             o.setOrderStatus(OrderStatus.NEW);
             o.setTransaction(transaction);
             crud.createEntity(o);
@@ -75,10 +75,11 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     private void validateOrdersDetails(Collection<Order> orders) throws NewTransactionException {
         for (Order o : orders) {
-            if (o.getBookSupplier().getPrice().equals(crud.retrieveEntity(o.getBookSupplier()).getPrice())) {
+            BookSupplier realBookSupplier = crud.retrieveEntity(o.getBookSupplier());
+            if (!o.getUnitPrice().equals(realBookSupplier.getPrice())) {
                 throw new NewTransactionException(NewTransactionException.Issue.PRICE_NOT_MATCH, o);
             }
-            if (o.getBookSupplier().getAmountAvailable() <= 0) {
+            if (realBookSupplier.getAmountAvailable() <= 0) {
                 throw new NewTransactionException(NewTransactionException.Issue.NOT_AVAILABLE, o);
             }
         }

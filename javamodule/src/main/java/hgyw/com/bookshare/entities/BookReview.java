@@ -6,9 +6,9 @@ package hgyw.com.bookshare.entities;
 public class BookReview extends Entity{
     private Customer customer;
     private Book book;
-    private Rating rating;
-    private String title;
-    private String description;
+    private Rating rating = Rating.EMPTY;
+    private String title = "";
+    private String description = "";
 
     public Book getBook() {
         return book;
