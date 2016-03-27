@@ -6,6 +6,7 @@ import java.util.Date;
 import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookSupplier;
+import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderStatus;
 import hgyw.com.bookshare.entities.Supplier;
@@ -44,13 +45,13 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
 
     @Override
     public Supplier retrieveSupplierDetails() {
-        return currentUser;
+        return crud.retrieveEntity(currentUser);
     }
 
     @Override
     public void updateSupplierDetails(Supplier newDetails) {
         requireItsMeForAccess(newDetails);
-        newDetails.setCredentials(retrieveSupplierDetails().getCredentials()); // Avoid change credentials by this method.
+        newDetails.setCredentials(crud.retrieveEntity(currentUser).getCredentials()); // Avoid change credentials by this method.
         crud.updateEntity(newDetails);
     }
 

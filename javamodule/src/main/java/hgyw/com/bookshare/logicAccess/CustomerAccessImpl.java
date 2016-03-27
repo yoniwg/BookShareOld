@@ -28,13 +28,13 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public Customer retrieveCustomerDetails() {
-        return crud.retrieveEntity(Customer.class, currentUser.getId());
+        return crud.retrieveEntity(currentUser);
     }
 
     @Override
     public void updateCustomerDetails(Customer newDetails) {
         requireItsMeForAccess(newDetails);
-        newDetails.setCredentials(retrieveCustomerDetails().getCredentials()); // Avoid change credentials by this method.
+        newDetails.setCredentials(crud.retrieveEntity(currentUser).getCredentials()); // Avoid change credentials by this method.
         crud.updateEntity(newDetails);
     }
 
