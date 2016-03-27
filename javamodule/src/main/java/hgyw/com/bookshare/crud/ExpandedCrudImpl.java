@@ -1,6 +1,7 @@
 package hgyw.com.bookshare.crud;
 
 import com.annimon.stream.Collectors;
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import java.util.Collection;
@@ -27,10 +28,9 @@ import hgyw.com.bookshare.entities.User;
 class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
 
     @Override
-    public User retrieveUserWithCredentials(Credentials credentials) {
+    public Optional<User> retrieveUserWithCredentials(Credentials credentials) {
         return streamAllUsers().filter(u -> u.getCredentials().equals(credentials))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override

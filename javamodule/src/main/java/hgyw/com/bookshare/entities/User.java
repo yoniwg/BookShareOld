@@ -14,7 +14,7 @@ public abstract class User extends Entity {
     private String firstName;
     private String lastName;
     private Date birthday;
-    private ImageEntity image;
+    private byte[] image;
 
     public Credentials getCredentials() {
         return credentials;
@@ -72,11 +72,11 @@ public abstract class User extends Entity {
         this.birthday = birthday;
     }
 
-    public ImageEntity getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(ImageEntity image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
 

@@ -13,7 +13,7 @@ public class Book extends Entity {
     private String bookAbstract;
     private String author;
     private Genre genre;
-    private ImageEntity image;
+    private byte[] image;
 
     public String getTitle() {
         return title;
@@ -47,11 +47,11 @@ public class Book extends Entity {
         this.genre = genre;
     }
 
-    public ImageEntity getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(ImageEntity image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
 

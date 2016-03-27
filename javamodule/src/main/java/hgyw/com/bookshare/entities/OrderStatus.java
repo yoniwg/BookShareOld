@@ -5,6 +5,6 @@ package hgyw.com.bookshare.entities;
  */
 public enum  OrderStatus {
 
-    NEW, WAITING_FOR_PAYING, SENT, CLOSED
+    NEW, WAITING_FOR_PAYING, SENT, CLOSED, WAITING_FOR_CANCEL, CANCELED
 
 }

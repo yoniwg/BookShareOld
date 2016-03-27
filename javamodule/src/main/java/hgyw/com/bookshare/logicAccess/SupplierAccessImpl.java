@@ -1,7 +1,12 @@
 package hgyw.com.bookshare.logicAccess;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.nio.Buffer;
 import java.util.Collection;
 import java.util.Date;
+
+import javax.imageio.ImageIO;
 
 import hgyw.com.bookshare.crud.ExpandedCrud;
 import hgyw.com.bookshare.entities.Book;
@@ -68,7 +73,11 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
     @Override
     public void updateOrderStatus(long orderId, OrderStatus orderStatus) {
         Order order = crud.retrieveEntity(Order.class, orderId);
+        OrderStatus currentOrderStatus = order.getOrderStatus();
         requireItsMeForAccess(order.getBookSupplier().getSupplier());
+        if (orderStatus == OrderStatus.CANCELED && currentOrderStatus != OrderStatus.WAITING_FOR_CANCEL) {
+            throw new IllegalStateException("You cannot cancel non-waiting-for-cancel order");
+        }
         order.setOrderStatus(orderStatus);
         crud.updateEntity(order);
     }

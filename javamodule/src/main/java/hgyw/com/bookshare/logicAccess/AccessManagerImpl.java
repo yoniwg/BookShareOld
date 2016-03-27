@@ -8,6 +8,7 @@ import hgyw.com.bookshare.entities.Guest;
 import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 import hgyw.com.bookshare.entities.UserType;
+import hgyw.com.bookshare.exceptions.WrongLoginException;
 
 /**
  * Created by Yoni on 3/13/2016.
@@ -31,21 +32,22 @@ enum  AccessManagerImpl implements AccessManager {
     }
 
     @Override
-    public void signUp(User user) {
+    public void signUp(User user) throws WrongLoginException {
         if (!(user instanceof Customer || user instanceof Supplier)) throw new IllegalArgumentException("The user should be instance of Customer or Supplier.");
         if (user.getId() == 0) throw new IllegalArgumentException("New item should have id 0.");
         if (crud.isUsernameTaken(user.getCredentials().getUsername())) {
-            throw new RuntimeException("Username and password are taken.");
+            throw new WrongLoginException(WrongLoginException.Issue.USERNAME_TAKEN);
         }
         crud.createEntity(user);
         signIn(user.getCredentials());
     }
 
     @Override
-    public void signIn(Credentials credentials) {
-        if (currentUser != guest) throw new IllegalStateException("There has been a user that is signed in.");
-        User newUser = crud.retrieveUserWithCredentials(credentials);
-        if (newUser == null) throw new RuntimeException("Wrong username and password"); // TODO specific exception
+    public void signIn(Credentials credentials) throws WrongLoginException {
+        if (currentUser != guest) throw new IllegalStateException("There is a user that has already been signed in.");
+        User newUser = crud.retrieveUserWithCredentials(credentials).orElseThrow(()->
+            new WrongLoginException(WrongLoginException.Issue.WRONG_USERNAME_OR_PWORD)
+        );
         switchAccess(newUser);
     }
 

@@ -1,5 +1,7 @@
 package hgyw.com.bookshare.crud;
 
+import com.annimon.stream.Optional;
+
 import java.util.Collection;
 import java.util.Date;
 
@@ -22,7 +24,7 @@ public interface ExpandedCrud extends Crud {
      * @param credentials The credentials to which we want match.
      * @return The user object (Customer or Supplier). null if it was found.
      */
-    User retrieveUserWithCredentials(Credentials credentials);
+    Optional<User> retrieveUserWithCredentials(Credentials credentials);
 
     /**
      * Return whether specific user name is taken,

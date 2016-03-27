@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import hgyw.com.bookshare.exceptions.NewTransactionException;
+import hgyw.com.bookshare.exceptions.WrongLoginException;
 import hgyw.com.bookshare.logicAccess.*;
 import hgyw.com.bookshare.crud.*;
 import hgyw.com.bookshare.entities.*;
@@ -58,10 +59,14 @@ public class javaProgram {
 
         System.out.println("print TOTAL-TIME = " + (-startTimeCount + (startTimeCount = System.currentTimeMillis())));
 
-        accessChecking();
+        try {
+            accessChecking();
+        } catch (WrongLoginException e) {
+            e.printStackTrace();
+        }
     }
 
-    private static void accessChecking() {
+    private static void accessChecking() throws WrongLoginException {
         System.out.println("\n ******************** Access Checking ******************** ");
 
         AccessManager manager = AccessManagerFactory.getInstance();

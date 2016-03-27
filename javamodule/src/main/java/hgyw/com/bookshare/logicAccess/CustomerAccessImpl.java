@@ -88,7 +88,12 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
     public void cancelOrder(long orderId) {
         Order order = crud.retrieveEntity(Order.class, orderId);
         requireItsMeForAccess(order.getTransaction().getCustomer());
-        throw new UnsupportedOperationException(); // TODO ?
+        if (!(order.getOrderStatus() == OrderStatus.NEW
+                || order.getOrderStatus() == OrderStatus.WAITING_FOR_PAYING)){
+            throw new IllegalStateException("Status must be " + OrderStatus.NEW + " or " + OrderStatus.WAITING_FOR_PAYING + ".");
+        }
+        order.setOrderStatus(OrderStatus.WAITING_FOR_CANCEL);
+        crud.updateEntity(order);
     }
 
     @Override
