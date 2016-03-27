@@ -170,6 +170,7 @@ class CrudTest {
             transaction.setId(0);
             transaction.setDate(getRandomDate(-4, -2));
             transaction.setCustomer(getRandomItem(Customer.class));
+            crud.createEntity(transaction);
             for (int i = 0; i < 3; i++) {
                 order = new Order();
                 order.setBookSupplier(getRandomItem(BookSupplier.class));
@@ -184,7 +185,6 @@ class CrudTest {
                 order.computePriceByBookSupplier();
                 crud.createEntity(order);
             }
-            crud.createEntity(transaction);
         }
 
         // ****************************************************** //

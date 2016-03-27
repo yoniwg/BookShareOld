@@ -48,7 +48,8 @@ public class ReflectionProperties {
             String getterNameWithoutPrefix = removePrefixFromGetter(m);
             if (getterNameWithoutPrefix != null && !getterNameWithoutPrefix.equals("Class")) {
                 String propertyName = Character.toLowerCase(getterNameWithoutPrefix.charAt(0)) + getterNameWithoutPrefix.substring(1);
-                Property p = new ReflectedProperty(propertyName, m, getSetter(m.getDeclaringClass(), propertyName, m.getReturnType()));
+                Method setter = getSetter(m.getDeclaringClass(), getterNameWithoutPrefix, m.getReturnType());
+                Property p = new ReflectedProperty(propertyName, m, setter);
                 map.put(p.getName(), p);
             }
         }

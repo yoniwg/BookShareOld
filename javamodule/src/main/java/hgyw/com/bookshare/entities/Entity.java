@@ -85,11 +85,11 @@ public abstract class Entity implements Cloneable{
             StringBuilder str = new StringBuilder();
             for (Map.Entry<String, Property> e : map.entrySet()) {
                 Object value = e.getValue().get(this);
-                if (value instanceof Entity) value = "(" +  ((Entity) value).getId() +")";
+                if (value instanceof Entity) value = "(id=" +  ((Entity) value).getId() +")";
                 if (str.length() != 0) str.append(", ");
                 str.append(e.getKey()).append("=").append(value);
             }
-            return getClass().getSimpleName() + "(" + idProperty.get(this) + "){" + str + "}";
+            return getClass().getSimpleName() + "(id=" + idProperty.get(this) + "){" + str + "}";
         } catch (InvocationTargetException e) {
             return this.getClass().getSimpleName() + "{Error in reflect this object.}";
         }

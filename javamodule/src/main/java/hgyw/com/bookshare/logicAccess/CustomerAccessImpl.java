@@ -62,6 +62,7 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
     public void performNewTransaction(Transaction transaction, Collection<Order> orders) throws NewTransactionException {
         requireItsMeForAccess(transaction.getCustomer());
         validateOrdersDetails(orders);
+        crud.createEntity(transaction);
         for (Order o : orders) {
             o.setId(0);
             o.setOrderStatus(OrderStatus.NEW);
@@ -69,8 +70,6 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
             crud.createEntity(o);
         }
         transaction.setDate(new Date());
-        crud.createEntity(transaction);
-
     }
 
     private void validateOrdersDetails(Collection<Order> orders) throws NewTransactionException {

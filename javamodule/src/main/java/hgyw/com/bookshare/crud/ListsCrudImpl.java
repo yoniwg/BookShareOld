@@ -35,7 +35,7 @@ class ListsCrudImpl implements Crud {
             throw new IllegalArgumentException("ID must be 0");
         }
         generateNewId(item);
-        entityList.add((Entity) item.clone());
+        entityList.add(item.clone());
     }
 
     private List<Entity> getListOrCreate(Class<? extends Entity> clazz) {
