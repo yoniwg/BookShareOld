@@ -3,7 +3,7 @@ package hgyw.com.bookshare.logicAccess;
 import java.util.Collection;
 import java.util.Date;
 
-import hgyw.com.bookshare.crud.ExpandedCrud;
+import hgyw.com.bookshare.dataAccess.DataAccess;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
@@ -21,21 +21,19 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     final private Customer currentUser;
 
-    public CustomerAccessImpl(ExpandedCrud crud, Customer currentUser) {
+    public CustomerAccessImpl(DataAccess crud, Customer currentUser) {
         super(crud, currentUser);
         this.currentUser = currentUser;
     }
 
     @Override
     public Customer retrieveCustomerDetails() {
-        return crud.retrieveEntity(currentUser);
+        return retrieveUserDetails(currentUser);
     }
 
     @Override
     public void updateCustomerDetails(Customer newDetails) {
-        requireItsMeForAccess(newDetails);
-        newDetails.setCredentials(crud.retrieveEntity(currentUser).getCredentials()); // Avoid change credentials by this method.
-        crud.updateEntity(newDetails);
+        updateUserDetails(currentUser, newDetails);
     }
 
     @Override
@@ -54,22 +52,28 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
     }
 
     @Override
-    public Collection<Order> retrieveOpenOrders() {
+    public Collection<Order> retrieveActiveOrders() {
         return crud.retrieveOrders(currentUser, null, null, null, true);
     }
 
     @Override
     public void performNewTransaction(Transaction transaction, Collection<Order> orders) throws NewTransactionException {
+        // create transaction
         requireItsMeForAccess(transaction.getCustomer());
         validateOrdersDetails(orders);
+        transaction.setDate(new Date());
         crud.createEntity(transaction);
+        // create orders
         for (Order o : orders) {
             o.setId(0);
             o.setOrderStatus(OrderStatus.NEW);
             o.setTransaction(transaction);
             crud.createEntity(o);
+            // decrease amount available
+            BookSupplier bookSupplier = crud.retrieveEntity(o.getBookSupplier());
+            bookSupplier.setAmountAvailable(bookSupplier.getAmountAvailable());
+            crud.updateEntity(bookSupplier);
         }
-        transaction.setDate(new Date());
     }
 
     private void validateOrdersDetails(Collection<Order> orders) throws NewTransactionException {

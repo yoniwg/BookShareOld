@@ -1,17 +1,11 @@
 package hgyw.com.bookshare.logicAccess;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.nio.Buffer;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.imageio.ImageIO;
-
-import hgyw.com.bookshare.crud.ExpandedCrud;
+import hgyw.com.bookshare.dataAccess.DataAccess;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookSupplier;
-import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderStatus;
 import hgyw.com.bookshare.entities.Supplier;
@@ -23,7 +17,7 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
 
     final private Supplier currentUser;
 
-    public SupplierAccessImpl(ExpandedCrud crud, Supplier currentUser) {
+    public SupplierAccessImpl(DataAccess crud, Supplier currentUser) {
         super(crud, currentUser);
         this.currentUser = currentUser;
     }
@@ -50,14 +44,12 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
 
     @Override
     public Supplier retrieveSupplierDetails() {
-        return crud.retrieveEntity(currentUser);
+        return retrieveUserDetails(currentUser);
     }
 
     @Override
     public void updateSupplierDetails(Supplier newDetails) {
-        requireItsMeForAccess(newDetails);
-        newDetails.setCredentials(crud.retrieveEntity(currentUser).getCredentials()); // Avoid change credentials by this method.
-        crud.updateEntity(newDetails);
+        updateUserDetails(currentUser, newDetails);
     }
 
     @Override

@@ -1,9 +1,10 @@
-package hgyw.com.bookshare.crud;
+package hgyw.com.bookshare.dataAccess;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,16 +17,18 @@ import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Customer;
+import hgyw.com.bookshare.entities.Entity;
 import hgyw.com.bookshare.entities.Order;
-import hgyw.com.bookshare.entities.OrderStatus;
 import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.Transaction;
 import hgyw.com.bookshare.entities.User;
+import hgyw.com.bookshare.entities.reflection.Property;
+import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
 
 /**
  * Created by haim7 on 23/03/2016.
  */
-class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
+class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
     @Override
     public Optional<User> retrieveUserWithCredentials(Credentials credentials) {
@@ -58,7 +61,7 @@ class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
                 .filter(o -> (customer == null || o.getTransaction().getCustomer().equals(customer))
                         && (supplier == null || o.getBookSupplier().equals(supplier))
                         && Auxiliaries.isBetween(o.getTransaction().getDate(), fromDate, toDate)
-                        && (!onlyOpen || o.getOrderStatus() != OrderStatus.CLOSED)
+                        && (!onlyOpen || o.getOrderStatus().isActive())
                 ).collect(Collectors.toList());
     }
 
@@ -100,6 +103,14 @@ class ExpandedCrudImpl extends ListsCrudImpl implements ExpandedCrud {
                 .sortBy(Map.Entry::getValue)
                 .map(Map.Entry::getKey).limit(amount).collect(Collectors.toList());
     }
+
+
+    @Override
+    public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity referredItem) {
+        Property p = ReflectionProperties.getPropertyOfType(referringClass, referredItem.getClass());
+        return findEntityByProperty(p, referredItem);
+    }
+
 
 
 }

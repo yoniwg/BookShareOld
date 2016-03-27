@@ -2,7 +2,7 @@ package hgyw.com.bookshare.logicAccess;
 
 import java.util.Collection;
 
-import hgyw.com.bookshare.crud.ExpandedCrud;
+import hgyw.com.bookshare.dataAccess.DataAccess;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
@@ -15,7 +15,7 @@ import hgyw.com.bookshare.entities.User;
  */
 class GeneralAccessImpl implements GeneralAccess {
 
-    final protected ExpandedCrud crud;
+    final protected DataAccess crud;
     final private User currentUser;
 
     protected void requireItsMeForAccess(User user) {
@@ -24,7 +24,7 @@ class GeneralAccessImpl implements GeneralAccess {
         }
     }
 
-    public GeneralAccessImpl(ExpandedCrud crud, User currentUser) {
+    public GeneralAccessImpl(DataAccess crud, User currentUser) {
         this.crud = crud;
         this.currentUser = currentUser;
     }
@@ -52,6 +52,16 @@ class GeneralAccessImpl implements GeneralAccess {
     @Override
     public Collection<Supplier> retrieveSuppliers(Book book) {
         return crud.findEntityReferTo(Supplier.class, book);
+    }
+
+    public <T extends User> T retrieveUserDetails(T currentUser) {
+        return crud.retrieveEntity(currentUser);
+    }
+
+    public <T extends User> void updateUserDetails(T currentUser, T newDetails) {
+        requireItsMeForAccess(newDetails);
+        newDetails.setCredentials(crud.retrieveEntity(currentUser).getCredentials()); // Avoid change credentials by this method.
+        crud.updateEntity(newDetails);
     }
 
 }

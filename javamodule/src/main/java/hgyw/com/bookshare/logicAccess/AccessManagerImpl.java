@@ -1,7 +1,7 @@
 package hgyw.com.bookshare.logicAccess;
 
-import hgyw.com.bookshare.crud.CrudFactory;
-import hgyw.com.bookshare.crud.ExpandedCrud;
+import hgyw.com.bookshare.dataAccess.CrudFactory;
+import hgyw.com.bookshare.dataAccess.DataAccess;
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Guest;
@@ -17,7 +17,7 @@ enum  AccessManagerImpl implements AccessManager {
     INSTANCE;
 
     private final User guest = new Guest();
-    private final ExpandedCrud crud = (ExpandedCrud) CrudFactory.getInstance();
+    private final DataAccess crud = (DataAccess) CrudFactory.getInstance();
     private GeneralAccess currentAccess;
     private User currentUser;
 
@@ -68,7 +68,7 @@ enum  AccessManagerImpl implements AccessManager {
 
     @Override
     public void signOut() {
-        switchAccess(guest);
+        if (currentAccess != guest) switchAccess(guest);
     }
 
     @Override

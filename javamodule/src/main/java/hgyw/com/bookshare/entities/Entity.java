@@ -25,30 +25,10 @@ public abstract class Entity implements Cloneable{
     @Override
     public Entity clone() {
         try {
-            Entity newEntity = (Entity) super.clone();
-            // deep cloning
-            for (Property p : ReflectionProperties.getPropertiesMap(getClass()).values()) {
-                if (p.canWrite()) {
-                    // Clone entity references in this item
-                    if (Entity.class.isAssignableFrom(p.getPropertyClass())) {
-                        Entity value = (Entity) p.get(newEntity);
-                        if (value != null) value = value.clone();
-                        p.set(newEntity, value);
-                    }
-                    // Clone entity references in list in this item
-                    else if (Collection.class.isAssignableFrom(p.getPropertyClass())) {
-                        Collection<?> value = (Collection) p.get(newEntity);
-                        Collection<Object> newCollection = new ArrayList<>(value);
-                        for (Object o : value) newCollection.add(o instanceof Entity ?((Entity)o).clone() : o);
-                        p.set(newEntity, newCollection);
-                    }
-
-                }
-            }
-            return newEntity;
+            return (Entity) super.clone();
         }
-        catch (CloneNotSupportedException | InvocationTargetException e) {
-            throw new InternalError("Unreached code", e); // Unreached code - isAccessible required below
+        catch (CloneNotSupportedException /*| InvocationTargetException*/ e) {
+            throw new InternalError("Unreached code", e); // Unreached code //- isAccessible required below
         }
     }
 

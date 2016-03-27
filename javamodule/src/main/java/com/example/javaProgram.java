@@ -12,18 +12,18 @@ import java.util.NoSuchElementException;
 import hgyw.com.bookshare.exceptions.NewTransactionException;
 import hgyw.com.bookshare.exceptions.WrongLoginException;
 import hgyw.com.bookshare.logicAccess.*;
-import hgyw.com.bookshare.crud.*;
+import hgyw.com.bookshare.dataAccess.*;
 import hgyw.com.bookshare.entities.*;
 
 public class javaProgram {
 
-    private static Crud crud;
+    private static DataAccess dataAccess;
 
     public static void main(String[] args) {
 
         long startTimeCount = System.currentTimeMillis();
 
-        crud = CrudFactory.getInstance();
+        dataAccess = CrudFactory.getInstance();
 
         System.out.println("initializing TOTAL-TIME = " + (-startTimeCount + (startTimeCount = System.currentTimeMillis())));
 
@@ -45,7 +45,7 @@ public class javaProgram {
             System.out.println("\n *** Colning test ***");
             Order first, cloned;
 
-            first = crud.retrieveEntity(Order.class, 1);
+            first = dataAccess.retrieveEntity(Order.class, 1);
             cloned = (Order) first.clone();
             System.out.println("First: " + first);
             System.out.println("Cloned: " + cloned);
@@ -75,7 +75,7 @@ public class javaProgram {
 
         System.out.println("Book Reviews: " + access.getBookReviews(getRandomItem(Book.class)));
 
-        Book book = getRandomItem(Book.class);//crud.retrieveEntity(Book.class, 2);
+        Book book = getRandomItem(Book.class);//dataAccess.retrieveEntity(Book.class, 2);
         System.out.println("This is a book: " + book);
 
         try {
@@ -175,15 +175,15 @@ public class javaProgram {
         Date now = new Date(), yesterday = new Date(now.getTime() - (long)(24*60*6*1000 * Math.random()));
         System.out.println("Retrieve Orders today: " + cAccess.retrieveOrders(yesterday, now));
         System.out.println("Retrieve Orders this moment: " + cAccess.retrieveOrders(now, now));
-        System.out.println("Retrieve Orders open: " + cAccess.retrieveOpenOrders());
+        System.out.println("Retrieve Orders open: " + cAccess.retrieveActiveOrders());
 
 
     }
 
     static <T extends Entity> T getRandomItem(Class<T> clazz) {
-        long index = (long) (crud.streamAll(clazz).count() * Math.random());
-        return crud.streamAll(clazz).skip(index).findFirst().orElseThrow(() -> new NoSuchElementException("TESTING MESSAGE: the stream of entity is empty"));
-        //return crud.retrieveEntity(clazz, 1);
+        long index = (long) (dataAccess.streamAll(clazz).count() * Math.random());
+        return dataAccess.streamAll(clazz).skip(index).findFirst().orElseThrow(() -> new NoSuchElementException("TESTING MESSAGE: the stream of entity is empty"));
+        //return dataAccess.retrieveEntity(clazz, 1);
     }
 
 }

@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.crud;
+package hgyw.com.bookshare.dataAccess;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
@@ -21,7 +21,6 @@ import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
  */
 class ListsCrudImpl implements Crud {
 
-    //static final ListsCrudImpl INSTANCE = new ListsCrudImpl();
     protected ListsCrudImpl() {}
 
     private Map<Class<? extends Entity>, Long> entitiesIdMap = new HashMap<>();
@@ -75,18 +74,9 @@ class ListsCrudImpl implements Crud {
 
     @Override
     public <T extends Entity> T retrieveEntity(Class<? extends T> entityClass, long id) {
-        Optional<T> entity = streamAll(entityClass)
-                .filter(e -> e.getId() == id)
-                .findFirst();
-        if (entity.isPresent()) return (T) entity.get().clone();
-        throw new NoSuchElementException("No such entity with such ID");
+        return (T) cloneNestedEntities(retrieveOriginalEntity(entityClass, id));
     }
 
-    @Override
-    public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity referredItem) {
-        Property p = ReflectionProperties.getPropertyOfType(referringClass, referredItem.getClass());
-        return findEntityByProperty(p, referredItem);
-    }
 
     protected <T extends Entity> Collection<T> findEntityByProperty(Property p, Object propertyValue) {
         return this.streamAll((Class<? extends T>) p.getReflectedClass())
@@ -102,5 +92,29 @@ class ListsCrudImpl implements Crud {
         return retrieveEntity((Class<? extends T>) item.getClass(), item.getId());
     }
 
+    private <T extends Entity> T retrieveOriginalEntity(Class<? extends T> entityClass, long id) {
+        Optional<T> entity = streamAll(entityClass)
+                .filter(e -> e.getId() == id)
+                .findFirst();
+        if (entity.isPresent()) return entity.get();
+        throw new NoSuchElementException("No such entity with such ID");
+    }
+
+    public Entity cloneNestedEntities(Entity entity) {
+        entity = entity.clone();
+        for (Property p : ReflectionProperties.getPropertiesMap(entity.getClass()).values()) {
+            if (p.canWrite() && Entity.class.isAssignableFrom(p.getPropertyClass())) {
+                try {
+                    Entity currentNestedEntity = (Entity) p.get(entity);
+                    Class<? extends Entity> nestedEntityClass = (Class<? extends Entity>) p.getPropertyClass();
+                    Entity originalNestedEntity = retrieveOriginalEntity(nestedEntityClass, currentNestedEntity.getId());
+                    p.set(entity, originalNestedEntity);
+                } catch (InvocationTargetException e) {
+                    throw new InternalError(); // unreached code
+                }
+            }
+        }
+        return entity;
+    }
 
 }

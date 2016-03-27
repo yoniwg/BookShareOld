@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.crud;
+package hgyw.com.bookshare.dataAccess;
 
 import com.annimon.stream.Optional;
 
@@ -10,6 +10,7 @@ import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Customer;
+import hgyw.com.bookshare.entities.Entity;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
@@ -17,7 +18,7 @@ import hgyw.com.bookshare.entities.User;
 /**
  * Created by haim7 on 24/03/2016.
  */
-public interface ExpandedCrud extends Crud {
+public interface DataAccess extends Crud {
 
     /**
      * Retrieve user with credentials match the credentials parameters.
@@ -67,5 +68,15 @@ public interface ExpandedCrud extends Crud {
      * @return Collection of BookSupplier's.
      */
     Collection<BookSupplier> findSpecialOffers(User user, int limit);
+
+
+    /**
+     * Find list of all items of referringClass that refer to referredItem.
+     * @param <T>
+     * @param referringClass Referring class
+     * @param referredItem Item that referred by items.
+     * @return Collection of referring items.
+     */
+    <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity referredItem);
 
 }

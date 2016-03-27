@@ -7,6 +7,7 @@ import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Supplier;
+import hgyw.com.bookshare.entities.User;
 
 /**
  * Created by Yoni on 3/13/2016.
@@ -20,7 +21,7 @@ public interface GeneralAccess {
     Collection<BookReview> getBookReviews(Book book);
     Collection<Supplier> retrieveSuppliers(Book book);
 
-    Object getCurrentUser();
+    User getCurrentUser();
 
 
 }

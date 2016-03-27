@@ -1,4 +1,4 @@
-package hgyw.com.bookshare.crud;
+package hgyw.com.bookshare.dataAccess;
 
 /**
  * Created by Yoni on 3/17/2016.
@@ -9,18 +9,18 @@ public class CrudFactory {
 
     private static DatabaseType currentDB = DatabaseType.LISTS;
 
-    private static ExpandedCrud crud;
+    private static DataAccess crud;
 
     private CrudFactory() {}
 
     /**
      * @return
      */
-    static synchronized public ExpandedCrud getInstance(){
+    static synchronized public DataAccess getInstance(){
         if (crud == null) {
             switch (currentDB) {
                 case LISTS:
-                    crud = new ExpandedCrudImpl();
+                    crud = new DataAccessImpl();
                     new CrudTest((ListsCrudImpl) crud); // test.
                     break;
                 case SQL_LITE:
