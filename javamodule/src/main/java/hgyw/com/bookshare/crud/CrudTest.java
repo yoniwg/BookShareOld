@@ -219,7 +219,7 @@ class CrudTest {
     }
 
     private Date getRandomDate(double fromDays, double toDays) {
-        return new Date(System.currentTimeMillis() + (long)( 24*60*60* (fromDays +  (toDays - fromDays)*Math.random())));
+        return new Date(System.currentTimeMillis() + (long)( 24*60*60*1000* (fromDays +  (toDays - fromDays)*Math.random())));
     }
 
 

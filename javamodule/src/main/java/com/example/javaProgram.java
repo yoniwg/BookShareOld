@@ -167,7 +167,7 @@ public class javaProgram {
         }
 
         System.out.println("Retrieve Orders: " + cAccess.retrieveOrders(null, null));
-        Date now = new Date(), yesterday = new Date(now.getTime() - 24*60*60);
+        Date now = new Date(), yesterday = new Date(now.getTime() - (long)(24*60*6*1000 * Math.random()));
         System.out.println("Retrieve Orders today: " + cAccess.retrieveOrders(yesterday, now));
         System.out.println("Retrieve Orders this moment: " + cAccess.retrieveOrders(now, now));
         System.out.println("Retrieve Orders open: " + cAccess.retrieveOpenOrders());
