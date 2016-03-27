@@ -80,6 +80,6 @@ public abstract class User extends Entity {
         this.image = image;
     }
 
-    abstract public UserType userType();
+    abstract public UserType getUserType();
 
 }

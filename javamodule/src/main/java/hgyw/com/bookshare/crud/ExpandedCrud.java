@@ -44,9 +44,10 @@ public interface ExpandedCrud extends Crud {
      * Retrieve orders according to parameters are provided.
      * @param customer customer whose orders we wants.
      * @param supplier
-     *@param fromDate Start date. null for ever.
+     * @param fromDate Start date. null for ever.
      * @param toDate End date. null for ever.
-     * @param onlyOpen boolean value that indicates whether to retrieve only open orders.    @return Collection of thw results.
+     * @param onlyOpen boolean value that indicates whether to retrieve only open orders.
+     * @return Collection of the results.
      */
     Collection<Order> retrieveOrders(Customer customer, Supplier supplier, Date fromDate, Date toDate, boolean onlyOpen);
 

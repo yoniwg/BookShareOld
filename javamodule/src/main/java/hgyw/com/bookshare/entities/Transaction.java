@@ -8,7 +8,6 @@ import java.util.Date;
 public class Transaction extends Entity {
 
     private Customer customer;
-
     private Date date = new Date();
 
     public Date getDate() {

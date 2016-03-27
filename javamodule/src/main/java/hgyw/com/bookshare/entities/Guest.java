@@ -5,7 +5,7 @@ package hgyw.com.bookshare.entities;
  */
 public class Guest extends User {
     @Override
-    public UserType userType() {
+    public UserType getUserType() {
         return UserType.GUEST;
     }
 }

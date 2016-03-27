@@ -50,7 +50,7 @@ enum  AccessManagerImpl implements AccessManager {
     }
 
     private void switchAccess(User newUser) {
-        switch (newUser.userType()) {
+        switch (newUser.getUserType()) {
             case GUEST:
                 currentAccess = new GeneralAccessImpl(crud, newUser);
                 break;
@@ -90,7 +90,7 @@ enum  AccessManagerImpl implements AccessManager {
 
     @Override
     public UserType getCurrentUserType() {
-        return currentUser.userType();
+        return currentUser.getUserType();
     }
 
 }

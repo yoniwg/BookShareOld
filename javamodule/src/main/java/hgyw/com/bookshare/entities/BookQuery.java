@@ -4,6 +4,8 @@ import com.annimon.stream.function.Predicate;
 
 import java.math.BigDecimal;
 
+import hgyw.com.bookshare.Auxiliaries.Auxiliaries;
+
 /**
  * Created by Yoni on 3/15/2016.
  */
@@ -64,6 +66,6 @@ public class BookQuery implements Predicate<BookSupplier>{
         return book.getTitle().toLowerCase().contains(getTitleQuery().toLowerCase())
                 && book.getAuthor().toLowerCase().contains(getAuthorQuery().toLowerCase())
                 && (genreQuery == null || book.getGenre() == genreQuery)
-                && hgyw.com.bookshare.Auxiliaries.Auxiliaries.isBetween(price, beginPrice, endPrice);
+                && Auxiliaries.isBetween(price, beginPrice, endPrice);
     }
 }
