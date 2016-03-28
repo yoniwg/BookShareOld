@@ -26,6 +26,7 @@ class ListsCrudImpl implements Crud {
 
     @Override
     public void createEntity(Entity item) {
+        item.setDeleted(false);
         List<Entity> entityList = getListOrCreate(item.getClass());
 
         if (item.getId() != 0) {
@@ -52,6 +53,7 @@ class ListsCrudImpl implements Crud {
 
     @Override
     public void updateEntity(Entity item) {
+        item.setDeleted(false);
         List<Entity> entityList = entitiesMap.get(item.getClass());
         if (entityList == null || !entityList.remove(item)) throw createNoSuchEntityException(item.getClass(), item.getId());
         entityList.add(deepCloneByDatabase(item));
@@ -59,14 +61,15 @@ class ListsCrudImpl implements Crud {
 
     @Override
     public void deleteEntity(Entity item) {
+        List<Entity> entityList = entitiesMap.get(item.getClass());
+        if (entityList == null) throw createNoSuchEntityException(item.getClass(), item.getId());
         if (hasReferenceTo(item.getClass(), item.getId())) {
+            if (entityList == null || !entityList.remove(item)) throw createNoSuchEntityException(item.getClass(), item.getId());
             item.setDeleted(true);
-            updateEntity(item);
+            entityList.add(deepCloneByDatabase(item));
         }
         else {
-            List<Entity> entityList = entitiesMap.get(item.getClass());
-            if (entityList == null) throw createNoSuchEntityException(item.getClass(), item.getId());
-            entityList.remove(item);
+            if (!entityList.remove(item))  throw createNoSuchEntityException(item.getClass(), item.getId());
         }
     }
 
