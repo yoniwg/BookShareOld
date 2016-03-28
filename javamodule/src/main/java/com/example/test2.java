@@ -162,6 +162,7 @@ public class test2 {
         bookQuery.setPriceBounds(BigDecimal.valueOf(135), BigDecimal.valueOf(165));
         // add bookSupplier for these book and current supplier
         List<Book> booksFound = Stream.of(sa.findBooks(bookQuery)).map(BookSupplier::getBook).distinct().collect(Collectors.toList());
+        System.out.println(" *** books found: "); booksFound.forEach(System.out::println);
         for (Book b : booksFound) {
             bookSupplier.setId(0);
             bookSupplier.setBook(b);
@@ -176,6 +177,9 @@ public class test2 {
         supplier.setPhoneNumber("03-3333333");
         sa.updateSupplierDetails(supplier);
 
+        // retrive supplier books
+        System.out.println(" *** Books of supplier: " + supplier);
+        sa.retrieveMyBooks().forEach(System.out::println);
 
         //////////////////////////////
         accessManager.signOut();
