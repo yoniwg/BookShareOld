@@ -1,1 +1,2 @@
 include ':javamodule'
+include ':app'

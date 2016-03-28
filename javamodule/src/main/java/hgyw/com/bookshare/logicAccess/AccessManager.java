@@ -6,7 +6,8 @@ import hgyw.com.bookshare.entities.UserType;
 import hgyw.com.bookshare.exceptions.WrongLoginException;
 
 /**
- * Created by haim7 on 23/03/2016.
+ * Interface for management of login to application.
+ * The default connection is by guest user, and such is when the signOut() is called.
  */
 public interface AccessManager {
 
@@ -34,7 +35,7 @@ public interface AccessManager {
     void signIn(Credentials credentials) throws WrongLoginException;
 
     /**
-     * Sign out and set access to guest access.
+     * Sign out and set the access to guest access.
      * If no user signed out the method do nothing.
      */
     void signOut();

@@ -14,12 +14,34 @@ import hgyw.com.bookshare.entities.User;
  */
 public interface GeneralAccess {
 
+    /**
+     * Find books by query.
+     * @param query The query
+     * @return collections of BookSuppliers math the quary.
+     */
     Collection<BookSupplier> findBooks(BookQuery query);
-    Collection<BookSupplier> findSpecialOffers(int limit);
-    Collection<BookReview> getBookReviews(Book book);
-    Collection<BookSupplier> retrieveSuppliers(Book book);
 
-    User getCurrentUser();
+    /**
+     * Find special offers for current user.
+     * @param limit number of the offers are requested.
+     * @return Collection of BookSuppliers.
+     */
+    Collection<BookSupplier> findSpecialOffers(int limit);
+
+    /**
+     *
+     * @param book the book.
+     * @return collection of BookReview.
+     */
+    Collection<BookReview> getBookReviews(Book book);
+
+    /**
+     * Retrieve BookSuppliers of book.
+     * @param book the book
+     * @return Collection of BookSuppliers.
+     * @throws java.util.NoSuchElementException if the book is not found in database
+     */
+    Collection<BookSupplier> retrieveSuppliers(Book book);
 
 
 }

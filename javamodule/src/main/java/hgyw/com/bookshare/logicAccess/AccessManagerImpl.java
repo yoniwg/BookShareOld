@@ -1,6 +1,6 @@
 package hgyw.com.bookshare.logicAccess;
 
-import hgyw.com.bookshare.dataAccess.CrudFactory;
+import hgyw.com.bookshare.dataAccess.DataAccessFactory;
 import hgyw.com.bookshare.dataAccess.DataAccess;
 import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Customer;
@@ -13,11 +13,11 @@ import hgyw.com.bookshare.exceptions.WrongLoginException;
 /**
  * Created by Yoni on 3/13/2016.
  */
-enum  AccessManagerImpl implements AccessManager {
+enum AccessManagerImpl implements AccessManager {
     INSTANCE;
 
     private final User guest = new Guest();
-    private final DataAccess crud = (DataAccess) CrudFactory.getInstance();
+    private final DataAccess crud = DataAccessFactory.getInstance();
     private GeneralAccess currentAccess;
     private User currentUser;
 
@@ -33,8 +33,12 @@ enum  AccessManagerImpl implements AccessManager {
 
     @Override
     public void signUp(User user) throws WrongLoginException {
-        if (!(user instanceof Customer || user instanceof Supplier)) throw new IllegalArgumentException("The user should be instance of Customer or Supplier.");
-        if (user.getId() == 0) throw new IllegalArgumentException("New item should have id 0.");
+        if (!(user.getUserType() == UserType.CUSTOMER || user.getUserType() == UserType.SUPPLIER)) {
+            throw new IllegalArgumentException("The user should be instance of Customer or Supplier.");
+        }
+        if (user.getId() == 0) {
+            throw new IllegalArgumentException("New item should have id 0.");
+        }
         if (crud.isUsernameTaken(user.getCredentials().getUsername())) {
             throw new WrongLoginException(WrongLoginException.Issue.USERNAME_TAKEN);
         }
@@ -46,7 +50,7 @@ enum  AccessManagerImpl implements AccessManager {
     public void signIn(Credentials credentials) throws WrongLoginException {
         if (currentUser != guest) throw new IllegalStateException("There is a user that has already been signed in.");
         User newUser = crud.retrieveUserWithCredentials(credentials).orElseThrow(()->
-            new WrongLoginException(WrongLoginException.Issue.WRONG_USERNAME_OR_PWORD)
+            new WrongLoginException(WrongLoginException.Issue.WRONG_USERNAME_OR_PASSWORD)
         );
         switchAccess(newUser);
     }

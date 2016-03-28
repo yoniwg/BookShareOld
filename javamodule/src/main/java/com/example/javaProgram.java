@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import hgyw.com.bookshare.exceptions.NewTransactionException;
+import hgyw.com.bookshare.exceptions.OrdersTransactionException;
 import hgyw.com.bookshare.exceptions.WrongLoginException;
 import hgyw.com.bookshare.logicAccess.*;
 import hgyw.com.bookshare.dataAccess.*;
@@ -23,7 +23,7 @@ public class javaProgram {
 
         long startTimeCount = System.currentTimeMillis();
 
-        dataAccess = CrudFactory.getInstance();
+        dataAccess = DataAccessFactory.getInstance();
 
         System.out.println("initializing TOTAL-TIME = " + (-startTimeCount + (startTimeCount = System.currentTimeMillis())));
 
@@ -138,7 +138,7 @@ public class javaProgram {
         System.out.println("** Book Review functions **");
         System.out.println("These are current book reviews: " + cAccess.getBookReviews(book));
         BookReview newReview = new BookReview();
-        newReview.setCustomer((Customer) cAccess.getCurrentUser());
+        newReview.setCustomer(cAccess.retrieveCustomerDetails());
         newReview.setBook(book);
         newReview.setTitle("My first review");
         newReview.setDescription("Bla bla bla, bla bla, bla bla bla - bla bla - bla bla.");
@@ -167,7 +167,7 @@ public class javaProgram {
         }
         try {
             cAccess.performNewTransaction(transaction, orderList);
-        } catch (NewTransactionException e) {
+        } catch (OrdersTransactionException e) {
             e.printStackTrace();
         }
 

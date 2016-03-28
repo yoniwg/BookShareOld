@@ -3,7 +3,7 @@ package hgyw.com.bookshare.dataAccess;
 /**
  * Created by Yoni on 3/17/2016.
  */
-public class CrudFactory {
+public class DataAccessFactory {
 
     private enum DatabaseType { LISTS, SQL_LITE ,MY_SQL}
 
@@ -11,7 +11,7 @@ public class CrudFactory {
 
     private static DataAccess crud;
 
-    private CrudFactory() {}
+    private DataAccessFactory() {}
 
     /**
      * @return

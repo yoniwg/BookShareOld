@@ -12,7 +12,7 @@ import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderRating;
 import hgyw.com.bookshare.entities.OrderStatus;
 import hgyw.com.bookshare.entities.Transaction;
-import hgyw.com.bookshare.exceptions.NewTransactionException;
+import hgyw.com.bookshare.exceptions.OrdersTransactionException;
 
 /**
  * Created by haim7 on 20/03/2016.
@@ -57,11 +57,14 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
     }
 
     @Override
-    public void performNewTransaction(Transaction transaction, Collection<Order> orders) throws NewTransactionException {
-        // create transaction
+    public void performNewTransaction(Transaction transaction, Collection<Order> orders) throws OrdersTransactionException {
+        // validations and check that transaction can be done
         requireItsMeForAccess(transaction.getCustomer());
-        validateOrdersDetails(orders);
+        validateOrdersTransaction(orders);
+        // create transaction
+        transaction.setId(0);
         transaction.setDate(new Date());
+        transaction.setCustomer(retrieveCustomerDetails());
         crud.createEntity(transaction);
         // create orders
         for (Order o : orders) {
@@ -76,14 +79,16 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
         }
     }
 
-    private void validateOrdersDetails(Collection<Order> orders) throws NewTransactionException {
+    private void validateOrdersTransaction(Collection<Order> orders) throws OrdersTransactionException {
         for (Order o : orders) {
+            // Validates according to bookSupplier in the database, the Order::getBookSupplier() is
+            //   only reference, and can be non updated.
             BookSupplier realBookSupplier = crud.retrieveEntity(o.getBookSupplier());
             if (!o.getUnitPrice().equals(realBookSupplier.getPrice())) {
-                throw new NewTransactionException(NewTransactionException.Issue.PRICE_NOT_MATCH, o);
+                throw new OrdersTransactionException(OrdersTransactionException.Issue.PRICE_NOT_MATCH, o);
             }
             if (realBookSupplier.getAmountAvailable() <= 0) {
-                throw new NewTransactionException(NewTransactionException.Issue.NOT_AVAILABLE, o);
+                throw new OrdersTransactionException(OrdersTransactionException.Issue.NOT_AVAILABLE, o);
             }
         }
     }

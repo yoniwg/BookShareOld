@@ -19,7 +19,7 @@ class GeneralAccessImpl implements GeneralAccess {
     final private User currentUser;
 
     protected void requireItsMeForAccess(User user) {
-        if (!user.equals(getCurrentUser())) {
+        if (!user.equals(currentUser)) {
             throw new IllegalArgumentException("The current user has not access to manipulate other users.");
         }
     }
@@ -42,11 +42,6 @@ class GeneralAccessImpl implements GeneralAccess {
     @Override
     public Collection<BookReview> getBookReviews(Book book) {
         return crud.findEntityReferTo(BookReview.class, book);
-    }
-
-    @Override
-    public User getCurrentUser() {
-        return (User) currentUser.clone();
     }
 
     @Override

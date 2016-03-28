@@ -3,9 +3,9 @@ package hgyw.com.bookshare.exceptions;
 import hgyw.com.bookshare.entities.Order;
 
 /**
- * Created by Yoni on 3/27/2016.
+ * Exception about error in transaction of orders
  */
-public class NewTransactionException extends Exception {
+public class OrdersTransactionException extends Exception {
 
     private final Issue issue;
     private final Order order;
@@ -15,7 +15,7 @@ public class NewTransactionException extends Exception {
     }
 
 
-    public NewTransactionException(Issue issue, Order order) {
+    public OrdersTransactionException(Issue issue, Order order) {
         super(issue.toString());
         this.issue = issue;
         this.order = order;
