@@ -3,13 +3,16 @@ package hgyw.com.bookshare.dataAccess;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Function;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import hgyw.com.bookshare.Auxiliaries.Auxiliaries;
 import hgyw.com.bookshare.entities.Book;
@@ -72,17 +75,17 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
     @Override
     public List<BookSupplier> findSpecialOffers(User user, int limit) {
-        Stream<BookSupplier> listOfBooks = getDistinctBooksOfUser(user);
-        List<String> topAuthors = getTopInstances(listOfBooks.map(bs -> bs.getBook().getAuthor()), limit);
-        List<Book.Genre> topGenre = getTopInstances(listOfBooks.map(bs -> bs.getBook().getGenre()), limit);
+        List<String> topAuthors = getTopInstances(getDistinctBooksOfUser(user).map(bs -> bs.getBook().getAuthor()), limit);
+        List<Book.Genre> topGenre = getTopInstances(getDistinctBooksOfUser(user).map(bs -> bs.getBook().getGenre()), limit);
         //find books from top authors and genres
+        // give high priority to author & genre fitness
+        Function<BookSupplier, Integer> rateValueFoo = bs -> -(
+                        (topAuthors.contains(bs.getBook().getAuthor()) ? 1 : 0)
+                        + (topGenre.contains(bs.getBook().getGenre()) ? 1 : 0)
+        );
         return streamAllNonDeleted(BookSupplier.class)
-                //sort by author or genre - give high priority to author & genre fitness
-                .sortBy(bs ->
-                        - (topAuthors.contains(bs.getBook().getAuthor()) ? 1 : 0)
-                        - (topGenre.contains(bs.getBook().getGenre()) ? 1 : 0))
+                .sortBy(rateValueFoo)
                 .limit(limit)
-                .distinct()
                 .collect(Collectors.toList());
     }
 
@@ -106,18 +109,25 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
 
     @Override
-    public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity referredItem) {
-        Property p = PropertiesReflection.getPropertyOfType(referringClass, referredItem.getClass());
-        return findEntityByProperty(p, referredItem);
-    }
-
-    protected <T extends Entity> Collection<T> findEntityByProperty(Property p, Object propertyValue) {
-        return streamAllNonDeleted((Class<? extends T>) p.getReflectedClass())
+    public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity ... referredItem) {
+        return streamAllNonDeleted(referringClass)
                 .filter(e -> {
-                    try {
-                        return p.get(e).equals(propertyValue);
-                    } catch (InvocationTargetException ex) { return false; }
-                }).collect(Collectors.toList());
+                    for (Method method : e.getClass().getMethods()) {
+                        if (method.getName().startsWith("get")) {
+                            for (Entity refItem : referredItem) {
+                                if (method.getReturnType() == refItem.getClass()) {
+                                    try {
+                                        if (!method.invoke(e).equals(refItem)) return false;
+                                    } catch (IllegalAccessException | InvocationTargetException e1) {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+
     }
 
     public <T extends Entity> Stream<T> streamAllNonDeleted(Class<? extends T> entityType) {

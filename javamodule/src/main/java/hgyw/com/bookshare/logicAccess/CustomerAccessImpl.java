@@ -1,5 +1,7 @@
 package hgyw.com.bookshare.logicAccess;
 
+import com.annimon.stream.Stream;
+
 import java.util.Collection;
 import java.util.Date;
 
@@ -58,8 +60,8 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public void performNewTransaction(Transaction transaction, Collection<Order> orders) throws OrdersTransactionException {
+        Stream.of(orders).forEach(Order::computePriceByBookSupplier);
         // validations and check that transaction can be done
-        requireItsMeForAccess(transaction.getCustomer());
         validateOrdersTransaction(orders);
         // create transaction
         transaction.setId(0);
@@ -114,11 +116,19 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
     }
 
     @Override
-    public void writeBookReview(BookReview bookReview) {
+    public void addBookReview(BookReview bookReview) {
+        bookReview.setId(0);
         bookReview.setCustomer(currentUser);
-        // Bad implementation because more checks are needed:
-        if (bookReview.getId() == 0) dataAccess.createEntity(bookReview);
-        else dataAccess.updateEntity(bookReview);
+        if (dataAccess.findEntityReferTo(BookReview.class, currentUser).size() > 0) {
+            throw new IllegalStateException("The user already has review on this book!");
+        }
+        dataAccess.createEntity(bookReview);
+    }
+
+    @Override
+    public void updateBookReview(BookReview bookReview) {
+        requireItsMeForAccess(dataAccess.retrieveEntity(bookReview).getCustomer());
+        dataAccess.updateEntity(bookReview);
     }
 
     @Override

@@ -9,6 +9,7 @@ public class Transaction extends Entity {
 
     private Customer customer;
     private Date date = new Date();
+    private String creditCard = "";
 
     public Date getDate() {
         return date;
@@ -24,5 +25,13 @@ public class Transaction extends Entity {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public String getCreditCard() {
+        return creditCard;
+    }
+
+    public void setCreditCard(String creditCard) {
+        this.creditCard = creditCard;
     }
 }

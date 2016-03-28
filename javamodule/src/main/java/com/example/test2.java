@@ -4,7 +4,9 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import hgyw.com.bookshare.dataAccess.DataAccess;
@@ -19,6 +21,7 @@ import hgyw.com.bookshare.entities.Entity;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.Transaction;
+import hgyw.com.bookshare.exceptions.OrdersTransactionException;
 import hgyw.com.bookshare.exceptions.WrongLoginException;
 import hgyw.com.bookshare.logicAccess.AccessManager;
 import hgyw.com.bookshare.logicAccess.AccessManagerFactory;
@@ -42,6 +45,7 @@ public class test2 {
         Credentials firstSupplierCredentials = Credentials.create("firstSupplier", "sda34^fdgfd%");
         Credentials secondSupplierCredentials = Credentials.create("secondSupplier", "sda34^fdgfd%");
 
+        /////////////////////////////
         // new supplier
         Supplier supplier = new Supplier();
         supplier.setId(0);
@@ -65,7 +69,7 @@ public class test2 {
         bookSupplier.setId(0);
         bookSupplier.setBook(book);
         bookSupplier.setPrice(new BigDecimal("49.99"));
-        sa.writeBookSupplier(bookSupplier);
+        sa.addBookSupplier(bookSupplier);
 
         book.setId(0);
         book.setTitle("The Two Towers");
@@ -74,7 +78,7 @@ public class test2 {
         bookSupplier.setId(0);
         bookSupplier.setBook(book);
         bookSupplier.setPrice(new BigDecimal("89.99"));
-        sa.writeBookSupplier(bookSupplier);
+        sa.addBookSupplier(bookSupplier);
 
         book.setId(0);
         book.setTitle("The Return of the King");
@@ -83,7 +87,15 @@ public class test2 {
         bookSupplier.setId(0);
         bookSupplier.setBook(book);
         bookSupplier.setPrice(new BigDecimal("79.99"));
-        sa.writeBookSupplier(bookSupplier);
+        sa.addBookSupplier(bookSupplier);
+        try {
+            System.out.println("$$$Negative test: Trying to add again:");
+            sa.addBookSupplier(bookSupplier);
+        } catch (Exception e) {
+            System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+
+
 
         //////////////////////////////
         accessManager.signOut();
@@ -108,12 +120,12 @@ public class test2 {
         for (int i = 1; i <= 7; i++) {
             book.setId(0);
             book.setTitle("Harry potter " + i);
-            book.setAuthor("J.K.Rolling");
+            book.setAuthor("J.K.Rowling");
             sa.addBook(book);
             bookSupplier.setId(0);
             bookSupplier.setBook(book);
             bookSupplier.setPrice(BigDecimal.valueOf(100 + 10 * i));
-            sa.writeBookSupplier(bookSupplier);
+            sa.addBookSupplier(bookSupplier);
         }
 
         // add bookSupplier for another book
@@ -123,7 +135,7 @@ public class test2 {
         bookSupplier.setId(0);
         bookSupplier.setBook(book);
         bookSupplier.setPrice(BigDecimal.valueOf(77.88));
-        sa.writeBookSupplier(bookSupplier);
+        sa.addBookSupplier(bookSupplier);
 
         // retrieve all current harry potter books adn change the details of books
         bookQuery = new BookQuery();
@@ -139,8 +151,12 @@ public class test2 {
         bookQuery.setTitleQuery("HARRY POTTER 7");
         bookSupplier = sa.findBooks(bookQuery).iterator().next();
         sa.removeBookSupplier(bookSupplier);
-        try {sa.removeBookSupplier(bookSupplier);} catch (Exception e) {e.printStackTrace();}
-
+        try {
+            System.out.println("$$$Negative test: Try to remove again:");
+            sa.removeBookSupplier(bookSupplier);
+        } catch (Exception e) {
+            System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
 
         //////////////////////////////
         accessManager.signOut();
@@ -168,8 +184,7 @@ public class test2 {
             bookSupplier.setBook(b);
             bookSupplier.setSupplier(supplier);
             bookSupplier.setPrice(BigDecimal.valueOf(66.99));
-            sa.writeBookSupplier(bookSupplier);
-            //
+            sa.addBookSupplier(bookSupplier);
         }
 
         // update supplier details
@@ -180,6 +195,10 @@ public class test2 {
         // retrive supplier books
         System.out.println(" *** Books of supplier: " + supplier);
         sa.retrieveMyBooks().forEach(System.out::println);
+
+        bookSupplier = sa.retrieveMyBooks().iterator().next();
+        bookSupplier.setPrice(BigDecimal.valueOf(1000));
+        sa.updateBookSupplier(bookSupplier);
 
         //////////////////////////////
         accessManager.signOut();
@@ -196,7 +215,28 @@ public class test2 {
         } catch (WrongLoginException e) {
             e.printStackTrace();
         }
+        ca = accessManager.getCustomerAccess();
 
+        bookQuery = new BookQuery();
+        bookQuery.setAuthorQuery("Rowling");
+        bookQuery.setPriceBounds(BigDecimal.valueOf(105), BigDecimal.valueOf(145));
+        Collection<BookSupplier> booksForOrder = ca.findBooks(bookQuery);
+        List<Order> orders = Stream.of(booksForOrder).map(bs -> {
+            Order order = new Order();
+            order.setBookSupplier(bs);
+            order.computePriceByBookSupplier();
+            return order;
+        }).collect(Collectors.toList());
+        Transaction transaction = new Transaction();
+        transaction.setCreditCard("231972947817861868");
+        try {
+            ca.performNewTransaction(transaction, orders);
+        } catch (OrdersTransactionException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(" *** findSpecialOffers:");
+        ca.findSpecialOffers(100).forEach(System.out::println);
 
 
         //////////////////////////////

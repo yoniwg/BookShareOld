@@ -143,7 +143,7 @@ public class javaProgram {
         newReview.setTitle("My first review");
         newReview.setDescription("Bla bla bla, bla bla, bla bla bla - bla bla - bla bla.");
         System.out.println("This review we are trying to add: " + newReview);
-        cAccess.writeBookReview(newReview);
+        cAccess.addBookReview(newReview);
         System.out.println("These are current book reviews: " + cAccess.getBookReviews(book));
         System.out.println("Now we remove the review:");
         cAccess.removeBookReview(newReview);

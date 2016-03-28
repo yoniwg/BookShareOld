@@ -5,6 +5,7 @@ import java.util.Date;
 
 import hgyw.com.bookshare.dataAccess.DataAccess;
 import hgyw.com.bookshare.entities.Book;
+import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderStatus;
@@ -75,11 +76,20 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
     }
 
     @Override
-    public void writeBookSupplier(BookSupplier bookSupplier) {
+    public void addBookSupplier(BookSupplier bookSupplier) {
+        bookSupplier.setId(0);
         bookSupplier.setSupplier(currentUser);
-        // Bad implementation because more checks are needed:
-        if (bookSupplier.getId() == 0) dataAccess.createEntity(bookSupplier);
-        else dataAccess.updateEntity(bookSupplier);
+        Collection<BookSupplier> currentMatchedBookSuppliers = dataAccess.findEntityReferTo(BookSupplier.class, currentUser, bookSupplier.getBook());
+        if (currentMatchedBookSuppliers.size() > 0) {
+            throw new IllegalStateException("The user already has bookSupplier on this book!");
+        }
+        dataAccess.createEntity(bookSupplier);
+    }
+
+    @Override
+    public void updateBookSupplier(BookSupplier bookSupplier) {
+        requireItsMeForAccess(dataAccess.retrieveEntity(bookSupplier).getSupplier());
+        dataAccess.updateEntity(bookSupplier);
     }
 
     @Override

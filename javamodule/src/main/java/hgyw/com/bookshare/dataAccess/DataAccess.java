@@ -77,6 +77,6 @@ public interface DataAccess extends Crud {
      * @param referredItem Item that referred by items.
      * @return Collection of referring items.
      */
-    <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity referredItem);
+    <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity ... referredItem);
 
 }

@@ -54,28 +54,36 @@ class ListsCrudImpl implements Crud {
     @Override
     public void updateEntity(Entity item) {
         item.setDeleted(false);
-        List<Entity> entityList = entitiesMap.get(item.getClass());
-        if (entityList == null || !entityList.remove(item)) throw createNoSuchEntityException(item.getClass(), item.getId());
-        entityList.add(deepCloneByDatabase(item));
+        Entity retrievedItem = retrieveNonDeletedOriginalEntity(item);
+        assignAndSetReferencesByDatabase(retrievedItem, item);
+    }
+
+    private void assignAndSetReferencesByDatabase(Entity target, Entity source) {
+        for (Property p : PropertiesReflection.getPropertiesMap(target.getClass()).values()) {
+            if (!p.canWrite()) continue;
+            try {
+                Object value = p.get(source);
+                if (value instanceof Entity) {
+                    Entity nestedEntity = (Entity) value;
+                    value = retrieveOriginalEntity(nestedEntity.getClass(), nestedEntity.getId());
+                }
+                p.set(target, value);
+            } catch (InvocationTargetException e) {
+                // do nothing - unreached code
+            }
+        }
     }
 
     @Override
     public void deleteEntity(Entity item) {
-        List<Entity> entityList = entitiesMap.get(item.getClass());
-        if (entityList == null) throw createNoSuchEntityException(item.getClass(), item.getId());
-        if (hasReferenceTo(item.getClass(), item.getId())) {
-            if (entityList == null || !entityList.remove(item)) throw createNoSuchEntityException(item.getClass(), item.getId());
-            item.setDeleted(true);
-            entityList.add(deepCloneByDatabase(item));
-        }
-        else {
-            if (!entityList.remove(item))  throw createNoSuchEntityException(item.getClass(), item.getId());
-        }
+        Entity retrievedItem = retrieveNonDeletedOriginalEntity(item);
+        retrievedItem.setDeleted(true);
     }
 
-    private boolean hasReferenceTo(Class<? extends Entity> entityClass, long id) {
-        Entity item = retrieveOriginalEntity(entityClass, id); // throw if not found
-        return true; // TODO optimization/implementation
+    private Entity retrieveNonDeletedOriginalEntity(Entity item) {
+        Entity retrievedItem = retrieveOriginalEntity(item.getClass(), item.getId());
+        if (retrievedItem.isDeleted()) throw createNoSuchEntityException(item.getClass(), item.getId());
+        return retrievedItem;
     }
 
     public <T extends Entity> Stream<T> streamAll(Class<? extends T> entityType) {
@@ -96,9 +104,12 @@ class ListsCrudImpl implements Crud {
     }
 
     private <T extends Entity> T retrieveOriginalEntity(Class<? extends T> entityClass, long id) {
-        return streamAll(entityClass)
+        List<Entity> entityList = entitiesMap.get(entityClass);
+        if (entityList == null) throw createNoSuchEntityException(entityClass, id);
+        Entity item =  Stream.of(entityList)
                 .filter(e -> e.getId() == id)
                 .findFirst().orElseThrow(() -> createNoSuchEntityException(entityClass, id));
+        return (T) item;
 
     }
 
@@ -112,8 +123,7 @@ class ListsCrudImpl implements Crud {
             if (p.canWrite() && Entity.class.isAssignableFrom(p.getPropertyClass())) {
                 try {
                     Entity currentNestedEntity = (Entity) p.get(entity);
-                    Class<? extends Entity> nestedEntityClass = (Class<? extends Entity>) p.getPropertyClass();
-                    Entity originalNestedEntity = retrieveOriginalEntity(nestedEntityClass, currentNestedEntity.getId());
+                    Entity originalNestedEntity = retrieveOriginalEntity(currentNestedEntity.getClass(), currentNestedEntity.getId());
                     p.set(entity, originalNestedEntity);
                 } catch (InvocationTargetException e) {
                     throw new InternalError(); // unreached code

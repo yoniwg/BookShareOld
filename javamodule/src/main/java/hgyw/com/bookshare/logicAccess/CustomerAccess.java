@@ -59,6 +59,7 @@ public interface CustomerAccess extends GeneralAccess {
     /**
      * Make new transaction and associate collection of orders to it.
      * The price should be computed by Order::computePriceByBookSupplier().
+     * The method call the Order::computePriceByBookSupplier().
      * The details that should set automatically in new transaction and orders, will set
      *  automatically. that is, the id will be ignored, and such transaction reference in orders,
      *  and order status will reset, and the date of transaction. the customer in transaction will
@@ -89,12 +90,20 @@ public interface CustomerAccess extends GeneralAccess {
     void updateOrderRating(long orderId, OrderRating orderRating);
 
     /**
-     * Write a review for a book.
-     * the BookReview.customer will set to current user.
-     * If review is exists then the old review will be updated. otherwise new review will be created.
-     * @param bookReview the book review
+     * Add new review by current user for a book.
+     * The BookReview.customer will set to current user, and id will be generated.
+     * @param bookReview the new book review
+     * @throws IllegalStateException if current user already has review on this book
      */
-    void writeBookReview(BookReview bookReview);
+    void addBookReview(BookReview bookReview);
+
+    /**
+     * update exists review.
+     * @param bookReview the book review
+     * @throws IllegalArgumentException if this review is not belong to current user
+     * @throws java.util.NoSuchElementException if review is not found.
+     */
+    void updateBookReview(BookReview bookReview);
 
     /**
      * remove a book review

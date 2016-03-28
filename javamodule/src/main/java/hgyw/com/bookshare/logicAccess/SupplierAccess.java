@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import hgyw.com.bookshare.entities.Book;
+import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderStatus;
@@ -72,11 +73,20 @@ public interface SupplierAccess extends GeneralAccess {
     void updateOrderStatus(long orderId, OrderStatus orderStatus);
 
     /**
-     * add or update book supplier for book and current supplier user.
-     * the supplier will set to the current user, and the id is ignored and set to the generated id.
-     * @param bookSupplier the book supplier details
+     * Add new BookSupplier by current user for a book.
+     * The BookSupplier.supplier will set to current user, and id will be generated.
+     * @param bookSupplier the new BookSupplier
+     * @throws IllegalStateException if current user already has BookSupplier on this book
      */
-    void writeBookSupplier(BookSupplier bookSupplier);
+    void addBookSupplier(BookSupplier bookSupplier);
+
+    /**
+     * update exists BookSupplier.
+     * @param bookSupplier the BookSupplier
+     * @throws IllegalArgumentException if this BookSupplier is not belong to current user
+     * @throws java.util.NoSuchElementException if BookSupplier is not found.
+     */
+    void updateBookSupplier(BookSupplier bookSupplier);
 
     /**
      * remove a BookSupplier
