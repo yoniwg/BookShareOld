@@ -43,12 +43,12 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
     }
 
     private Stream<User> streamAllUsers() {
-        return Stream.concat(streamAll(Customer.class), streamAll(Supplier.class));
+        return Stream.concat(streamAllNonDeleted(Customer.class), streamAllNonDeleted(Supplier.class));
     }
 
     @Override
     public Collection<Customer> findInterestedInBook(Book book, User userAsked) {
-        return streamAll(Order.class)
+        return streamAllNonDeleted(Order.class)
                 .filter(o -> o.getBookSupplier().getBook().equals(book))
                 .map(Order::getTransaction)
                 .map(Transaction::getCustomer)
@@ -57,7 +57,7 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
     @Override
     public Collection<Order> retrieveOrders(Customer customer, Supplier supplier, Date fromDate, Date toDate, boolean onlyOpen) {
-        return streamAll(Order.class)
+        return streamAllNonDeleted(Order.class)
                 .filter(o -> (customer == null || o.getTransaction().getCustomer().equals(customer))
                                 && (supplier == null || o.getBookSupplier().equals(supplier))
                                 && Auxiliaries.isBetween(o.getTransaction().getDate(), fromDate, toDate)
@@ -67,7 +67,7 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
     @Override
     public List<BookSupplier> findBooks(BookQuery query) {
-        return streamAll(BookSupplier.class).filter(query).collect(Collectors.toList());
+        return streamAllNonDeleted(BookSupplier.class).filter(query).collect(Collectors.toList());
     }
 
     @Override
@@ -76,7 +76,7 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
         List<String> topAuthors = getTopInstances(listOfBooks.map(bs -> bs.getBook().getAuthor()), limit);
         List<Book.Genre> topGenre = getTopInstances(listOfBooks.map(bs -> bs.getBook().getGenre()), limit);
         //find books from top authors and genres
-        return streamAll(BookSupplier.class)
+        return streamAllNonDeleted(BookSupplier.class)
                 //sort by author or genre - give high priority to author & genre fitness
                 .sortBy(bs ->
                         - (topAuthors.contains(bs.getBook().getAuthor()) ? 1 : 0)
@@ -87,7 +87,7 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
     }
 
     private Stream<BookSupplier> getDistinctBooksOfUser(User currentUser) {
-        return streamAll(Order.class)
+        return streamAllNonDeleted(Order.class)
                 .filter(o -> o.getTransaction().getCustomer().equals(currentUser))
                 .map(Order::getBookSupplier)
                 .distinct();
@@ -112,7 +112,7 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
     }
 
     protected <T extends Entity> Collection<T> findEntityByProperty(Property p, Object propertyValue) {
-        return this.streamAll((Class<? extends T>) p.getReflectedClass())
+        return streamAllNonDeleted((Class<? extends T>) p.getReflectedClass())
                 .filter(e -> {
                     try {
                         return p.get(e).equals(propertyValue);
@@ -120,5 +120,7 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
                 }).collect(Collectors.toList());
     }
 
-
+    public <T extends Entity> Stream<T> streamAllNonDeleted(Class<? extends T> entityType) {
+        return super.streamAll(entityType).filter(e -> !e.isDeleted());
+    }
 }

@@ -21,7 +21,7 @@ public class DataAccessFactory {
             switch (currentDB) {
                 case LISTS:
                     crud = new DataAccessImpl();
-                    new CrudTest((ListsCrudImpl) crud); // test.
+                   // new CrudTest((ListsCrudImpl) crud); // test.
                     break;
                 case SQL_LITE:
                     //TODO

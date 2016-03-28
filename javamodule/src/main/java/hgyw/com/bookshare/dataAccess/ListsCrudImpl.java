@@ -52,17 +52,27 @@ class ListsCrudImpl implements Crud {
 
     @Override
     public void updateEntity(Entity item) {
-        deleteEntity(item);
-        // TODO delete subentities? psoudoDelete
-        getListOrCreate(item.getClass()).add(item);
+        List<Entity> entityList = entitiesMap.get(item.getClass());
+        if (entityList == null || !entityList.remove(item)) throw createNoSuchEntityException(item.getClass(), item.getId());
+        entityList.add(deepCloneByDatabase(item));
     }
 
     @Override
     public void deleteEntity(Entity item) {
-        List<Entity> entityList = entitiesMap.get(item.getClass());
-        if (entityList == null || !entityList.remove(item)) {
-            throw new NoSuchElementException("No such entity with such ID");
+        if (hasReferenceTo(item.getClass(), item.getId())) {
+            item.setDeleted(true);
+            updateEntity(item);
         }
+        else {
+            List<Entity> entityList = entitiesMap.get(item.getClass());
+            if (entityList == null) throw createNoSuchEntityException(item.getClass(), item.getId());
+            entityList.remove(item);
+        }
+    }
+
+    private boolean hasReferenceTo(Class<? extends Entity> entityClass, long id) {
+        Entity item = retrieveOriginalEntity(entityClass, id); // throw if not found
+        return true; // TODO optimization/implementation
     }
 
     public <T extends Entity> Stream<T> streamAll(Class<? extends T> entityType) {
@@ -83,11 +93,14 @@ class ListsCrudImpl implements Crud {
     }
 
     private <T extends Entity> T retrieveOriginalEntity(Class<? extends T> entityClass, long id) {
-        Optional<T> entity = streamAll(entityClass)
+        return streamAll(entityClass)
                 .filter(e -> e.getId() == id)
-                .findFirst();
-        if (entity.isPresent()) return entity.get();
-        throw new NoSuchElementException("No such entity with such ID");
+                .findFirst().orElseThrow(() -> createNoSuchEntityException(entityClass, id));
+
+    }
+
+    private static NoSuchElementException createNoSuchEntityException(Class<?> entityClass, long id) {
+        return new NoSuchElementException("No entity " + entityClass.getSimpleName() + " with ID " + id);
     }
 
     public Entity deepCloneByDatabase(Entity entity) {

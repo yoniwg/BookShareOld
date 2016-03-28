@@ -24,22 +24,17 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
 
     @Override
     public Collection<BookSupplier> retrieveMyBooks() {
-        return crud.findEntityReferTo(BookSupplier.class, currentUser);
+        return dataAccess.findEntityReferTo(BookSupplier.class, currentUser);
     }
 
     @Override
     public void addBook(Book book) {
-        crud.createEntity(book);
+        dataAccess.createEntity(book);
     }
 
     @Override
     public void updateBook(Book book) {
-        crud.updateEntity(book);
-    }
-
-    @Override
-    public void removeBook(Book book) {
-        crud.deleteEntity(book);
+        dataAccess.updateEntity(book);
     }
 
     @Override
@@ -54,17 +49,17 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
 
     @Override
     public Collection<Order> retrieveOrders(Date fromDate, Date toDate) {
-        return crud.retrieveOrders(null, currentUser, fromDate, toDate, false);
+        return dataAccess.retrieveOrders(null, currentUser, fromDate, toDate, false);
     }
 
     @Override
     public Collection<Order> retrieveActiveOrders(Date fromDate, Date toDate) {
-        return crud.retrieveOrders(null, currentUser, fromDate, toDate, true);
+        return dataAccess.retrieveOrders(null, currentUser, fromDate, toDate, true);
     }
 
     @Override
     public void updateOrderStatus(long orderId, OrderStatus orderStatus) {
-        Order order = crud.retrieveEntity(Order.class, orderId);
+        Order order = dataAccess.retrieveEntity(Order.class, orderId);
         OrderStatus currentOrderStatus = order.getOrderStatus();
         requireItsMeForAccess(order.getBookSupplier().getSupplier());
         // the WAITING_FOR_CANCEL can set only by customer request.
@@ -76,6 +71,21 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
             throw new IllegalStateException("You cannot cancel non-waiting-for-cancel order");
         }
         order.setOrderStatus(orderStatus);
-        crud.updateEntity(order);
+        dataAccess.updateEntity(order);
     }
+
+    @Override
+    public void writeBookSupplier(BookSupplier bookSupplier) {
+        bookSupplier.setSupplier(currentUser);
+        // Bad implementation because more checks are needed:
+        if (bookSupplier.getId() == 0) dataAccess.createEntity(bookSupplier);
+        else dataAccess.updateEntity(bookSupplier);
+    }
+
+    @Override
+    public void removeBookSupplier(BookSupplier bookSupplier) {
+        requireItsMeForAccess(dataAccess.retrieveEntity(bookSupplier).getSupplier());
+        dataAccess.deleteEntity(bookSupplier);
+    }
+
 }

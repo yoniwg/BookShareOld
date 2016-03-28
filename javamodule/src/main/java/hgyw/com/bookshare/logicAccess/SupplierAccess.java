@@ -36,17 +36,10 @@ public interface SupplierAccess extends GeneralAccess {
     void updateBook(Book book);
 
     /**
-     * Remove the book with id of book.getId() from database.
-     * @param book the book by its id to remove.
-     * @throws java.util.NoSuchElementException if a book with such id is not found.
-     */
-    void removeBook(Book book);
-
-    /**
      * retrieve the supplier's details
      * @return the details
      */
-    User retrieveSupplierDetails();
+    Supplier retrieveSupplierDetails();
 
     /**
      * replace the current supplier's details with the provided details
@@ -78,4 +71,18 @@ public interface SupplierAccess extends GeneralAccess {
      */
     void updateOrderStatus(long orderId, OrderStatus orderStatus);
 
+    /**
+     * add or update book supplier for book and current supplier user.
+     * the supplier will set to the current user, and the id is ignored and set to the generated id.
+     * @param bookSupplier the book supplier details
+     */
+    void writeBookSupplier(BookSupplier bookSupplier);
+
+    /**
+     * remove a BookSupplier
+     * @param bookSupplier the BookSupplier with ID to delete
+     * @throws IllegalArgumentException if the BookSupplier is not of current supplier user.
+     * @throws java.util.NoSuchElementException if the BookSupplier is not found in database.
+     */
+    void removeBookSupplier(BookSupplier bookSupplier);
 }

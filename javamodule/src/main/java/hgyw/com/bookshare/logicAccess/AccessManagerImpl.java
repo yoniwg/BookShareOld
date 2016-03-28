@@ -36,7 +36,7 @@ enum AccessManagerImpl implements AccessManager {
         if (!(user.getUserType() == UserType.CUSTOMER || user.getUserType() == UserType.SUPPLIER)) {
             throw new IllegalArgumentException("The user should be instance of Customer or Supplier.");
         }
-        if (user.getId() == 0) {
+        if (user.getId() != 0) {
             throw new IllegalArgumentException("New item should have id 0.");
         }
         if (crud.isUsernameTaken(user.getCredentials().getUsername())) {

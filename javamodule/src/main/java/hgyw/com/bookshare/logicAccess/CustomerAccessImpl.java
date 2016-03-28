@@ -38,22 +38,22 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public Collection<BookReview> getCustomerReviews() {
-        return crud.findEntityReferTo(BookReview.class, currentUser);
+        return dataAccess.findEntityReferTo(BookReview.class, currentUser);
     }
 
     @Override
     public Collection<Customer> findInterestedInBook(Book book) {
-        return crud.findInterestedInBook(book, currentUser);
+        return dataAccess.findInterestedInBook(book, currentUser);
     }
 
     @Override
     public Collection<Order> retrieveOrders(Date fromDate, Date toDate) {
-        return crud.retrieveOrders(currentUser, null, fromDate, toDate, false);
+        return dataAccess.retrieveOrders(currentUser, null, fromDate, toDate, false);
     }
 
     @Override
     public Collection<Order> retrieveActiveOrders() {
-        return crud.retrieveOrders(currentUser, null, null, null, true);
+        return dataAccess.retrieveOrders(currentUser, null, null, null, true);
     }
 
     @Override
@@ -65,17 +65,17 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
         transaction.setId(0);
         transaction.setDate(new Date());
         transaction.setCustomer(retrieveCustomerDetails());
-        crud.createEntity(transaction);
+        dataAccess.createEntity(transaction);
         // create orders
         for (Order o : orders) {
             o.setId(0);
             o.setOrderStatus(OrderStatus.NEW);
             o.setTransaction(transaction);
-            crud.createEntity(o);
+            dataAccess.createEntity(o);
             // decrease amount available
-            BookSupplier bookSupplier = crud.retrieveEntity(o.getBookSupplier());
+            BookSupplier bookSupplier = dataAccess.retrieveEntity(o.getBookSupplier());
             bookSupplier.setAmountAvailable(bookSupplier.getAmountAvailable());
-            crud.updateEntity(bookSupplier);
+            dataAccess.updateEntity(bookSupplier);
         }
     }
 
@@ -83,7 +83,7 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
         for (Order o : orders) {
             // Validates according to bookSupplier in the database, the Order::getBookSupplier() is
             //   only reference, and can be non updated.
-            BookSupplier realBookSupplier = crud.retrieveEntity(o.getBookSupplier());
+            BookSupplier realBookSupplier = dataAccess.retrieveEntity(o.getBookSupplier());
             if (!o.getUnitPrice().equals(realBookSupplier.getPrice())) {
                 throw new OrdersTransactionException(OrdersTransactionException.Issue.PRICE_NOT_MATCH, o);
             }
@@ -95,35 +95,36 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public void cancelOrder(long orderId) {
-        Order order = crud.retrieveEntity(Order.class, orderId);
+        Order order = dataAccess.retrieveEntity(Order.class, orderId);
         requireItsMeForAccess(order.getTransaction().getCustomer());
         if (!(order.getOrderStatus() == OrderStatus.NEW
                 || order.getOrderStatus() == OrderStatus.WAITING_FOR_PAYING)){
             throw new IllegalStateException("Status must be " + OrderStatus.NEW + " or " + OrderStatus.WAITING_FOR_PAYING + ".");
         }
         order.setOrderStatus(OrderStatus.WAITING_FOR_CANCEL);
-        crud.updateEntity(order);
+        dataAccess.updateEntity(order);
     }
 
     @Override
     public void updateOrderRating(long orderId, OrderRating orderRating) {
-        Order order = crud.retrieveEntity(Order.class, orderId);
+        Order order = dataAccess.retrieveEntity(Order.class, orderId);
         requireItsMeForAccess(order.getTransaction().getCustomer());
         order.setOrderRating(orderRating);
-        crud.updateEntity(order);
+        dataAccess.updateEntity(order);
     }
 
     @Override
     public void writeBookReview(BookReview bookReview) {
-        requireItsMeForAccess(bookReview.getCustomer());
-        if (bookReview.getId() == 0) crud.createEntity(bookReview);
-        else crud.updateEntity(bookReview);
+        bookReview.setCustomer(currentUser);
+        // Bad implementation because more checks are needed:
+        if (bookReview.getId() == 0) dataAccess.createEntity(bookReview);
+        else dataAccess.updateEntity(bookReview);
     }
 
     @Override
     public void removeBookReview(BookReview bookReview) {
-        requireItsMeForAccess(crud.retrieveEntity(bookReview).getCustomer());
-        crud.deleteEntity(bookReview);
+        requireItsMeForAccess(dataAccess.retrieveEntity(bookReview).getCustomer());
+        dataAccess.deleteEntity(bookReview);
     }
 
 

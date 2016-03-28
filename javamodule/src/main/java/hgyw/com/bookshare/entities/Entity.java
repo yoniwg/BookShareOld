@@ -13,6 +13,7 @@ import hgyw.com.bookshare.entities.reflection.PropertiesReflection;
  */
 public abstract class Entity implements Cloneable{
     private long id;
+    private boolean isDeleted;
 
     /**
      * Get the id.
@@ -108,6 +109,7 @@ public abstract class Entity implements Cloneable{
             StringBuilder str = new StringBuilder();
             for (Map.Entry<String, Property> e : map.entrySet()) {
                 Object value = e.getValue().get(this);
+                if (value instanceof String) value = "'" +  value +"'";
                 if (value instanceof Entity) value = "(id=" +  ((Entity) value).getId() +")";
                 if (str.length() != 0) str.append(", ");
                 str.append(e.getKey()).append("=").append(value);
@@ -117,5 +119,13 @@ public abstract class Entity implements Cloneable{
             return this.getClass().getSimpleName() + "{Error in reflect this object.}";
         }
 
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

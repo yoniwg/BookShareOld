@@ -26,7 +26,7 @@ import hgyw.com.bookshare.entities.User;
  * Created by haim7 on 24/03/2016.
  */
 class CrudTest {
-
+/*
     private final ListsCrudImpl crud;
 
     public CrudTest(ListsCrudImpl crud) {
@@ -190,10 +190,7 @@ class CrudTest {
     }
 
 
-    /**
-     * Retrieve random entity item
-     * This should be an expensive method!
-     */
+    // Retrieve random entity item This should be an expensive method!
     private  <T extends Entity> T getRandomItem(Class<T> clazz) {
         long index = (long) (crud.streamAll(clazz).count() * Math.random());
         return crud.streamAll(clazz).skip(index).findFirst().orElseThrow(() -> new NoSuchElementException("TESTING MESSEGE: the stream of entity is empty"));
@@ -220,5 +217,5 @@ class CrudTest {
         return new Date(System.currentTimeMillis() + (long)( 24*60*60*1000* (fromDays +  (toDays - fromDays)*Math.random())));
     }
 
-
+*/
 }

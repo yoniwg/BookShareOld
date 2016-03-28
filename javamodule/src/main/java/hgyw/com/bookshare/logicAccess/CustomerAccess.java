@@ -90,6 +90,7 @@ public interface CustomerAccess extends GeneralAccess {
 
     /**
      * Write a review for a book.
+     * the BookReview.customer will set to current user.
      * If review is exists then the old review will be updated. otherwise new review will be created.
      * @param bookReview the book review
      */
@@ -98,6 +99,7 @@ public interface CustomerAccess extends GeneralAccess {
     /**
      * remove a book review
      * @param bookReview the review with ID to delete
+     * @throws IllegalArgumentException if the BookReview is not of current user.
      * @throws java.util.NoSuchElementException if the BookReview is not found in database.
      */
     void removeBookReview(BookReview bookReview);
