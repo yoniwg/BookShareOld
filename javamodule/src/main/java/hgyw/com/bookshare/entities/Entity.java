@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import hgyw.com.bookshare.entities.reflection.Property;
-import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
+import hgyw.com.bookshare.entities.reflection.PropertiesReflection;
 
 /**
  * Created by Yoni on 3/15/2016.
@@ -14,21 +14,64 @@ import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
 public abstract class Entity implements Cloneable{
     private long id;
 
+    /**
+     * Get the id.
+     * @return long value of id
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     * Set the id.
+     * @param id new long value of id
+     */
     public void setId(long id) {
         this.id = id;
     }
 
+    /**
+     * Do shallow copy on this entity
+     */
     @Override
     public Entity clone() {
         try {
             return (Entity) super.clone();
         }
-        catch (CloneNotSupportedException /*| InvocationTargetException*/ e) {
-            throw new InternalError("Unreached code", e); // Unreached code //- isAccessible required below
+        catch (CloneNotSupportedException  e) {
+            throw new InternalError();
+        }
+    }
+
+    /**
+     * Do deep clone on this entity - clone all nested entities, and all nested collections
+     * contains entities.
+     */
+    public Entity deepClone() {
+        try {
+            Entity newEntity = this.clone();
+            // deep cloning
+            for (Property p : PropertiesReflection.getPropertiesMap(getClass()).values()) {
+                if (p.canWrite()) {
+                    // Clone entity references in this item
+                    if (Entity.class.isAssignableFrom(p.getPropertyClass())) {
+                        Entity value = (Entity) p.get(newEntity);
+                        if (value != null) value = value.clone();
+                        p.set(newEntity, value);
+                    }
+                    // Clone entity references in list in this item
+                    else if (Collection.class.isAssignableFrom(p.getPropertyClass())) {
+                        Collection<?> value = (Collection) p.get(newEntity);
+                        Collection<Object> newCollection = new ArrayList<>(value);
+                        for (Object o : value) newCollection.add(o instanceof Entity ?((Entity)o).clone() : o);
+                        p.set(newEntity, newCollection);
+                    }
+                }
+            }
+            return newEntity;
+        }
+        catch (InvocationTargetException e) {
+            throw new InternalError("Unreached code", e); // Unreached code
         }
     }
 
@@ -60,7 +103,7 @@ public abstract class Entity implements Cloneable{
     @Override
     public String toString() {
         try {
-            Map<String, Property> map = ReflectionProperties.getPropertiesMap(this.getClass());
+            Map<String, Property> map = PropertiesReflection.getPropertiesMap(this.getClass());
             Property idProperty =  map.remove("id");
             StringBuilder str = new StringBuilder();
             for (Map.Entry<String, Property> e : map.entrySet()) {

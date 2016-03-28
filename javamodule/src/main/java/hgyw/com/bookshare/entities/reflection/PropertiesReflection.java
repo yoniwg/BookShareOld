@@ -13,7 +13,7 @@ import hgyw.com.bookshare.entities.Entity;
 /**
  * Created by haim7 on 23/03/2016.
  */
-public class ReflectionProperties {
+public class PropertiesReflection {
 
     /**
      * Returns the method name without prefix of "is" for boolean getter, or "get" for boolean and other getters.
@@ -33,6 +33,7 @@ public class ReflectionProperties {
 
     /**
      * Returns setter that its method name is "set"+setterNameWithoutPrefix, with the propertyType, in class declaringClass.
+     * @return the setter or nul if not fount.
      */
     private static Method getSetter(Class<?> declaringClass, String setterNameWithoutPrefix, Class<?> propertyType) {
         try {
@@ -56,11 +57,7 @@ public class ReflectionProperties {
         return map;
     }
 
-    public static Property getProperty(Class<?> clazz, String propertyName) {
-        return getPropertiesMap(clazz).get(propertyName);
-    }
-
-    public static <T extends Entity> Property getPropertyOfType(Class<T> clazz, Class<? extends Entity> propertyType) {
+    public static <T extends Entity> Property getPropertyOfType(Class<? extends T> clazz, Class<? extends Entity> propertyType) {
         for (Property p : getPropertiesMap(clazz).values())
             if (p.getPropertyClass() == propertyType)
                 return p;

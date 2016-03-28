@@ -14,12 +14,10 @@ import hgyw.com.bookshare.entities.User;
  */
 public interface GeneralAccess {
 
-    //==information==
-
     Collection<BookSupplier> findBooks(BookQuery query);
     Collection<BookSupplier> findSpecialOffers(int limit);
     Collection<BookReview> getBookReviews(Book book);
-    Collection<Supplier> retrieveSuppliers(Book book);
+    Collection<BookSupplier> retrieveSuppliers(Book book);
 
     User getCurrentUser();
 

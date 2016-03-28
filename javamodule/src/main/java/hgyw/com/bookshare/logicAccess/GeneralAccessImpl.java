@@ -50,8 +50,8 @@ class GeneralAccessImpl implements GeneralAccess {
     }
 
     @Override
-    public Collection<Supplier> retrieveSuppliers(Book book) {
-        return crud.findEntityReferTo(Supplier.class, book);
+    public Collection<BookSupplier> retrieveSuppliers(Book book) {
+        return crud.findEntityReferTo(BookSupplier.class, book);
     }
 
     public <T extends User> T retrieveUserDetails(T currentUser) {

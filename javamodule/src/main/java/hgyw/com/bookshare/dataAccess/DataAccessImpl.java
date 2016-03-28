@@ -23,7 +23,7 @@ import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.Transaction;
 import hgyw.com.bookshare.entities.User;
 import hgyw.com.bookshare.entities.reflection.Property;
-import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
+import hgyw.com.bookshare.entities.reflection.PropertiesReflection;
 
 /**
  * Created by haim7 on 23/03/2016.
@@ -59,9 +59,9 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
     public Collection<Order> retrieveOrders(Customer customer, Supplier supplier, Date fromDate, Date toDate, boolean onlyOpen) {
         return streamAll(Order.class)
                 .filter(o -> (customer == null || o.getTransaction().getCustomer().equals(customer))
-                        && (supplier == null || o.getBookSupplier().equals(supplier))
-                        && Auxiliaries.isBetween(o.getTransaction().getDate(), fromDate, toDate)
-                        && (!onlyOpen || o.getOrderStatus().isActive())
+                                && (supplier == null || o.getBookSupplier().equals(supplier))
+                                && Auxiliaries.isBetween(o.getTransaction().getDate(), fromDate, toDate)
+                                && (!onlyOpen || o.getOrderStatus().isActive())
                 ).collect(Collectors.toList());
     }
 
@@ -107,10 +107,18 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
     @Override
     public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity referredItem) {
-        Property p = ReflectionProperties.getPropertyOfType(referringClass, referredItem.getClass());
+        Property p = PropertiesReflection.getPropertyOfType(referringClass, referredItem.getClass());
         return findEntityByProperty(p, referredItem);
     }
 
+    protected <T extends Entity> Collection<T> findEntityByProperty(Property p, Object propertyValue) {
+        return this.streamAll((Class<? extends T>) p.getReflectedClass())
+                .filter(e -> {
+                    try {
+                        return p.get(e).equals(propertyValue);
+                    } catch (InvocationTargetException ex) { return false; }
+                }).collect(Collectors.toList());
+    }
 
 
 }

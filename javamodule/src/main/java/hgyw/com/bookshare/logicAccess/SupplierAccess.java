@@ -15,6 +15,7 @@ import hgyw.com.bookshare.entities.User;
  */
 public interface SupplierAccess extends GeneralAccess {
 
+
     Collection<BookSupplier> retrieveMyBooks();
     void addBook(Book book);
     void updateBook(Book book);

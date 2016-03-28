@@ -1,12 +1,10 @@
 package hgyw.com.bookshare.dataAccess;
 
-import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +12,7 @@ import java.util.NoSuchElementException;
 
 import hgyw.com.bookshare.entities.Entity;
 import hgyw.com.bookshare.entities.reflection.Property;
-import hgyw.com.bookshare.entities.reflection.ReflectionProperties;
+import hgyw.com.bookshare.entities.reflection.PropertiesReflection;
 
 /**
  * Created by Yoni on 3/17/2016.
@@ -34,7 +32,7 @@ class ListsCrudImpl implements Crud {
             throw new IllegalArgumentException("ID must be 0");
         }
         generateNewId(item);
-        entityList.add(item.clone());
+        entityList.add(deepCloneByDatabase(item));
     }
 
     private List<Entity> getListOrCreate(Class<? extends Entity> clazz) {
@@ -55,6 +53,7 @@ class ListsCrudImpl implements Crud {
     @Override
     public void updateEntity(Entity item) {
         deleteEntity(item);
+        // TODO delete subentities? psoudoDelete
         getListOrCreate(item.getClass()).add(item);
     }
 
@@ -68,24 +67,15 @@ class ListsCrudImpl implements Crud {
 
     public <T extends Entity> Stream<T> streamAll(Class<? extends T> entityType) {
         List<Entity> entityList = entitiesMap.get(entityType);
-        if (entityList != null) return Stream.of(entityList).map(e -> (T) e);
+        if (entityList != null) return Stream.of(entityList).map(e -> (T) e.deepClone());
         return Stream.empty();
     }
 
     @Override
     public <T extends Entity> T retrieveEntity(Class<? extends T> entityClass, long id) {
-        return (T) cloneNestedEntities(retrieveOriginalEntity(entityClass, id));
+        return (T) retrieveOriginalEntity(entityClass, id).deepClone();
     }
 
-
-    protected <T extends Entity> Collection<T> findEntityByProperty(Property p, Object propertyValue) {
-        return this.streamAll((Class<? extends T>) p.getReflectedClass())
-                .filter(e -> {
-                    try {
-                        return p.get(e).equals(propertyValue);
-                    } catch (InvocationTargetException ex) { return false; }
-                }).collect(Collectors.toList());
-    }
 
     @Override
     public <T extends Entity> T retrieveEntity(T item) {
@@ -100,9 +90,9 @@ class ListsCrudImpl implements Crud {
         throw new NoSuchElementException("No such entity with such ID");
     }
 
-    public Entity cloneNestedEntities(Entity entity) {
+    public Entity deepCloneByDatabase(Entity entity) {
         entity = entity.clone();
-        for (Property p : ReflectionProperties.getPropertiesMap(entity.getClass()).values()) {
+        for (Property p : PropertiesReflection.getPropertiesMap(entity.getClass()).values()) {
             if (p.canWrite() && Entity.class.isAssignableFrom(p.getPropertyClass())) {
                 try {
                     Entity currentNestedEntity = (Entity) p.get(entity);
