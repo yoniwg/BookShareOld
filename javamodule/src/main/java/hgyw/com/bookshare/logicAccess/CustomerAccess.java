@@ -43,16 +43,16 @@ public interface CustomerAccess extends GeneralAccess {
     Collection<Customer> findInterestedInBook(Book book);
 
     /**
-     * retrieve all order in a provided period
-     * @param fromDate - begin of period
-     * @param toDate - end of period
+     * retrieve all orders of current customer in a provided period
+     * @param fromDate begin of period
+     * @param toDate end of period
      * @return collection of orders
      */
     Collection<Order> retrieveOrders(Date fromDate, Date toDate);
 
     /**
-     * retrieve all active orders (not closed or canceled)
-     * @return collection of active orders
+     * retrieve all active orders of current customer (not closed or canceled)
+     * @return collection of orders
      */
     Collection<Order> retrieveActiveOrders();
 
@@ -76,6 +76,7 @@ public interface CustomerAccess extends GeneralAccess {
      * request to cancel the order
      * @param orderId the order id to cancel
      * @throws java.util.NoSuchElementException if the order with id orderId is not found.
+     * @throws IllegalStateException if current state of order does not allow canceling.
      */
     void cancelOrder(long orderId);
 

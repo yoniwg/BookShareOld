@@ -15,7 +15,7 @@ import hgyw.com.bookshare.entities.Supplier;
  */
 public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAccess {
 
-    final private Supplier currentUser;
+    private final Supplier currentUser;
 
     public SupplierAccessImpl(DataAccess crud, Supplier currentUser) {
         super(crud, currentUser);
@@ -58,7 +58,7 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
     }
 
     @Override
-    public Collection<Order> retrieveOpenOrders(Date fromDate, Date toDate) {
+    public Collection<Order> retrieveActiveOrders(Date fromDate, Date toDate) {
         return crud.retrieveOrders(null, currentUser, fromDate, toDate, true);
     }
 
@@ -67,6 +67,11 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
         Order order = crud.retrieveEntity(Order.class, orderId);
         OrderStatus currentOrderStatus = order.getOrderStatus();
         requireItsMeForAccess(order.getBookSupplier().getSupplier());
+        // the WAITING_FOR_CANCEL can set only by customer request.
+        if (orderStatus == OrderStatus.WAITING_FOR_CANCEL) {
+            throw new IllegalStateException("Supplier cannot set order state to waiting-for-cancel.");
+        }
+        // don't allow cance without customer request before.
         if (orderStatus == OrderStatus.CANCELED && currentOrderStatus != OrderStatus.WAITING_FOR_CANCEL) {
             throw new IllegalStateException("You cannot cancel non-waiting-for-cancel order");
         }
