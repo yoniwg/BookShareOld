@@ -217,6 +217,7 @@ public class test2 {
         }
         ca = accessManager.getCustomerAccess();
 
+        // order query results
         bookQuery = new BookQuery();
         bookQuery.setAuthorQuery("Rowling");
         bookQuery.setPriceBounds(BigDecimal.valueOf(105), BigDecimal.valueOf(145));
@@ -254,6 +255,7 @@ public class test2 {
         } catch (WrongLoginException e) {
             e.printStackTrace();
         }
+
 
         ///////////////////////////////////////////////////
         printWholeDatabase(DataAccessFactory.getInstance());

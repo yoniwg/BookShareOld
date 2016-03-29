@@ -72,22 +72,18 @@ public abstract class Entity implements Cloneable{
      */
     @Override
     public String toString() {
-        try {
-            Map<String, Property> map = PropertiesReflection.getPropertiesMap(this.getClass());
-            Property idProperty =  map.remove("id");
-            StringBuilder str = new StringBuilder();
-            for (Map.Entry<String, Property> e : map.entrySet()) {
-                Object value = e.getValue().get(this);
-                if (value instanceof String) value = "'" +  value +"'";
-                if (value instanceof Entity) value = "(" + ((Entity) value).shortDescription() +")";
-                if (str.length() != 0) str.append(", ");
-                str.append(e.getKey()).append("=").append(value);
-            }
-            return getClass().getSimpleName() + "(id=" + idProperty.get(this) + "){" + str + "}";
-        } catch (InvocationTargetException e) {
-            return this.getClass().getSimpleName() + "{Error in reflect this object.}";
+        Map<String, Property> map = PropertiesReflection.getPropertiesMap(this.getClass());
+        Property idProperty = map.remove("id");
+        StringBuilder str = new StringBuilder();
+        for (Map.Entry<String, Property> e : map.entrySet()) {
+            Object value = e.getValue().get(this);
+            if (value instanceof String) value = "'" + value + "'";
+            if (value instanceof Entity)
+                value = "(" + ((Entity) value).shortDescription() + ")";
+            if (str.length() != 0) str.append(", ");
+            str.append(e.getKey()).append("=").append(value);
         }
-
+        return getClass().getSimpleName() + "(id=" + idProperty.get(this) + "){" + str + "}";
     }
 
     protected String shortDescription() {

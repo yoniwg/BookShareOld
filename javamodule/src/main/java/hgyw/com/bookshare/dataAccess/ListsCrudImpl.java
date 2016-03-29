@@ -1,11 +1,8 @@
 package hgyw.com.bookshare.dataAccess;
 
-import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +31,9 @@ class ListsCrudImpl implements Crud {
             throw new IllegalArgumentException("ID must be 0");
         }
         generateNewId(item);
-        entityList.add(deepCloneByDatabase(item));
+        Entity newItem = item.clone();
+        assignOriginalNestedEntities(newItem);
+        entityList.add(newItem);
     }
 
     private List<Entity> getListOrCreate(Class<? extends Entity> clazz) {
@@ -56,7 +55,8 @@ class ListsCrudImpl implements Crud {
     public void updateEntity(Entity item) {
         item.setDeleted(false);
         Entity retrievedItem = retrieveNonDeletedOriginalEntity(item);
-        assignAndSetReferencesByDatabase(retrievedItem, item);
+        assignAllProperties(retrievedItem, item);
+        assignOriginalNestedEntities(retrievedItem);
     }
 
     @Override
@@ -102,67 +102,43 @@ class ListsCrudImpl implements Crud {
         return new NoSuchElementException("No entity " + entityClass.getSimpleName() + " with ID " + id);
     }
 
-    private void assignAndSetReferencesByDatabase(Entity target, Entity source) {
+    private void assignAllProperties(Object target, Object source) {
         for (Property p : PropertiesReflection.getPropertiesMap(target.getClass()).values()) {
-            if (!p.canWrite()) continue;
-            try {
+            if (p.canWrite()) {
                 Object value = p.get(source);
-                if (value instanceof Entity) {
-                    Entity nestedEntity = (Entity) value;
-                    value = retrieveOriginalEntity(nestedEntity.getClass(), nestedEntity.getId());
-                }
                 p.set(target, value);
-            } catch (InvocationTargetException e) {
-                // do nothing - unreached code
             }
         }
-    }
-
-    public Entity deepCloneByDatabase(Entity entity) {
-        entity = entity.clone();
-        for (Property p : PropertiesReflection.getPropertiesMap(entity.getClass()).values()) {
-            if (p.canWrite() && Entity.class.isAssignableFrom(p.getPropertyClass())) {
-                try {
-                    Entity currentNestedEntity = (Entity) p.get(entity);
-                    Entity originalNestedEntity = retrieveOriginalEntity(currentNestedEntity.getClass(), currentNestedEntity.getId());
-                    p.set(entity, originalNestedEntity);
-                } catch (InvocationTargetException e) {
-                    throw new InternalError(); // unreached code
-                }
-            }
-        }
-        return entity;
     }
 
     /**
-     * Do deep clone on this entity - clone all nested entities, and all nested collections
-     * contains entities.
+     * Do deep clone on this entity - clone all nested entities
      */
-    public <T extends Entity> T deepClone(T item) {
-        try {
-            Entity newItem = item.clone();
-            // deep cloning
-            for (Property p : PropertiesReflection.getPropertiesMap(getClass()).values()) {
-                if (p.canWrite()) {
-                    // Clone entity references in this item
-                    if (Entity.class.isAssignableFrom(p.getPropertyClass())) {
-                        Entity value = (Entity) p.get(newItem);
-                        if (value != null) value = value.clone();
-                        p.set(newItem, value);
-                    }
-                    // Clone entity references in list in this item
-                    else if (Collection.class.isAssignableFrom(p.getPropertyClass())) {
-                        Collection<?> value = (Collection) p.get(newItem);
-                        Collection<Object> newCollection = new ArrayList<>(value);
-                        for (Object o : value) newCollection.add(o instanceof Entity ?((Entity)o).clone() : o);
-                        p.set(newItem, newCollection);
-                    }
-                }
+    public Entity deepClone(Entity item) {
+        Entity newItem = item.clone();
+        cloneNestedEntities(newItem);
+        return newItem;
+    }
+
+    // throws NoSuchElementException
+    private void cloneNestedEntities(Object object) {
+        for (Property p : PropertiesReflection.getPropertiesMap(object.getClass()).values()) {
+            if (p.canWrite() && Entity.class.isAssignableFrom(p.getPropertyClass())) {
+                Entity value = (Entity) p.get(object);
+                if (value != null) value = value.clone();
+                p.set(object, value);
             }
-            return (T) newItem;
         }
-        catch (InvocationTargetException e) {
-            throw new InternalError("Unreached code", e); // Unreached code
+    }
+
+    // throws NoSuchElementException
+    private void assignOriginalNestedEntities(Object object) {
+        for (Property p : PropertiesReflection.getPropertiesMap(object.getClass()).values()) {
+            if (p.canWrite() && Entity.class.isAssignableFrom(p.getPropertyClass())) {
+                Entity value = (Entity) p.get(object);
+                if (value != null) value = retrieveOriginalEntity(value.getClass(), value.getId());
+                p.set(object, value);
+            }
         }
     }
 

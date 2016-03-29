@@ -3,6 +3,8 @@ package hgyw.com.bookshare.entities.reflection;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -77,25 +79,33 @@ public class PropertiesReflection {
             if (!Modifier.isPublic(getter.getModifiers()) || setter != null && !Modifier.isPublic(setter.getModifiers())) {
                 throw new IllegalArgumentException("The getter and setter should be public.");
             }
+            if (getter.getParameterTypes().length != 0) {
+                throw new IllegalArgumentException("The getter should not have parameters.");
+            }
+            if (setter != null) {
+                if (setter.getParameterTypes().length != 1 || setter.getParameterTypes()[0] != getter.getReturnType()) {
+                    throw new IllegalArgumentException("The setter should have only one parameter with type equals to returned type of getter.");
+                }
+            }
             this.name = Objects.requireNonNull(name); this.setter = setter; this.getter = getter;
         }
 
         @Override
-        public void set(Object o, Object value) throws InvocationTargetException {
+        public void set(Object o, Object value) {
             if (setter == null) throw new UnsupportedOperationException("The Property is read only.");
             try {
                 setter.invoke(o, value);
-            } catch (IllegalAccessException e) {
-                throw new InternalError(); // unreached code because the method is public
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new InternalError(e); // unreached code because the method is public
             }
         }
 
         @Override
-        public Object get(Object o) throws InvocationTargetException {
+        public Object get(Object o) {
             try {
                 return getter.invoke(o);
-            } catch (IllegalAccessException e) {
-                throw new InternalError(); // unreached code because the method is public
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new InternalError(e); // unreached code because the method is public
             }
         }
 
