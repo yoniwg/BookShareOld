@@ -8,7 +8,6 @@ import com.annimon.stream.function.Function;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,7 +71,7 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
     @Override
     public List<BookSupplier> findBooks(BookQuery query) {
-        return streamAllNonDeleted(BookSupplier.class).filter(query).collect(Collectors.toList());
+        return streamAllNonDeleted(BookSupplier.class).filter(bs -> performFilterQuery(bs, query)).collect(Collectors.toList());
     }
 
     @Override
@@ -138,5 +137,14 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
     public <T extends Entity> Stream<T> streamAllNonDeleted(Class<? extends T> entityType) {
         return super.streamAll(entityType).filter(e -> !e.isDeleted());
+    }
+
+    private boolean performFilterQuery(BookSupplier bookSupplier, BookQuery bookQuery) {
+        Book book = bookSupplier.getBook();
+        BigDecimal price = bookSupplier.getPrice();
+        return book.getTitle().toLowerCase().contains(bookQuery.getTitleQuery().toLowerCase())
+                && book.getAuthor().toLowerCase().contains(bookQuery.getAuthorQuery().toLowerCase())
+                && (bookQuery.getGenreQuery() == null || book.getGenre() == bookQuery.getGenreQuery())
+                && Auxiliaries.isBetween(price, bookQuery.getBeginPrice(), bookQuery.getEndPrice());
     }
 }
