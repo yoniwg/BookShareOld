@@ -5,8 +5,10 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -113,25 +115,18 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
         for (Entity e : referredItems) {
             retrieveEntity(e); // Throw exceptions if not found
         }
+        Collection<Property> properties = Stream.of(PropertiesReflection.getPropertiesMap(referringClass).values())
+                .filter(p -> Entity.class.isAssignableFrom(p.getPropertyClass()))
+                .collect(Collectors.toList());
         return streamAllNonDeleted(referringClass)
                 .filter(e -> {
-                    for (Method method : e.getClass().getMethods()) {
-                        if (method.getName().startsWith("get")) {
-                            for (Entity refItem : referredItems) {
-                                if (method.getReturnType() == refItem.getClass()) {
-                                    try {
-                                        if (!method.invoke(e).equals(refItem)) return false;
-                                    } catch (IllegalAccessException | InvocationTargetException e1) {
-                                        // do nothing
-                                    }
-                                }
-                            }
-                        }
+                    for (Property p : properties) for (Entity refItem : referredItems) {
+                        if (p.getPropertyClass() == refItem.getClass() && !p.get(e).equals(refItem))
+                            return false;
                     }
                     return true;
                 })
                 .collect(Collectors.toList());
-
     }
 
     public <T extends Entity> Stream<T> streamAllNonDeleted(Class<? extends T> entityType) {

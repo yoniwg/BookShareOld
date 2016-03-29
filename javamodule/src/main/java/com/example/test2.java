@@ -2,6 +2,7 @@ package com.example;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Consumer;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -260,11 +261,24 @@ public class test2 {
 
         // book review
         BookReview bookReview = new BookReview();
-        bookReview.setTitle("ספר דפןק");
+        bookReview.setBook(book);
+        bookReview.setTitle("Bad Book");
         bookReview.setDescription("The book is very very boring, and is not interesting at all.");
         ca.addBookReview(bookReview);
         bookReview.setRating(Rating.POOR);
         ca.updateBookReview(bookReview);
+        try {
+            System.out.println(" $$$ Negative test: ");
+            ca.addBookReview(bookReview);
+        } catch (Exception e) {
+            System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+        try {
+            System.out.println(" $$$ Negative test: ");
+            ca.removeBookReview(new BookReview());
+        } catch (Exception e) {
+            System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
 
         //////////////////////////////
         accessManager.signOut();
