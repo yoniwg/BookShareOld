@@ -69,4 +69,5 @@ public class Order extends Entity {
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
     }
+
 }

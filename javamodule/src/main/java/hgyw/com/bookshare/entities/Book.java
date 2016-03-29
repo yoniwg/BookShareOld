@@ -55,4 +55,8 @@ public class Book extends Entity {
         this.image = image;
     }
 
+    @Override
+    protected String shortDescription() {
+        return super.shortDescription() + " '" + getTitle() + "'";
+    }
 }

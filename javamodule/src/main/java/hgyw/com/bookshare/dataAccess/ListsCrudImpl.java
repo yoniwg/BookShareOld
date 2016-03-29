@@ -5,6 +5,7 @@ import com.annimon.stream.Stream;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,13 +73,13 @@ class ListsCrudImpl implements Crud {
 
     public <T extends Entity> Stream<T> streamAll(Class<? extends T> entityType) {
         List<Entity> entityList = entitiesMap.get(entityType);
-        if (entityList != null) return Stream.of(entityList).map(e -> (T) e.deepClone());
+        if (entityList != null) return Stream.of(entityList).map(e ->  (T) deepClone(e));
         return Stream.empty();
     }
 
     @Override
     public <T extends Entity> T retrieveEntity(Class<? extends T> entityClass, long id) {
-        return (T) retrieveOriginalEntity(entityClass, id).deepClone();
+        return (T) deepClone(retrieveOriginalEntity(entityClass, id));
     }
 
 
@@ -131,6 +132,38 @@ class ListsCrudImpl implements Crud {
             }
         }
         return entity;
+    }
+
+    /**
+     * Do deep clone on this entity - clone all nested entities, and all nested collections
+     * contains entities.
+     */
+    public <T extends Entity> T deepClone(T item) {
+        try {
+            Entity newItem = item.clone();
+            // deep cloning
+            for (Property p : PropertiesReflection.getPropertiesMap(getClass()).values()) {
+                if (p.canWrite()) {
+                    // Clone entity references in this item
+                    if (Entity.class.isAssignableFrom(p.getPropertyClass())) {
+                        Entity value = (Entity) p.get(newItem);
+                        if (value != null) value = value.clone();
+                        p.set(newItem, value);
+                    }
+                    // Clone entity references in list in this item
+                    else if (Collection.class.isAssignableFrom(p.getPropertyClass())) {
+                        Collection<?> value = (Collection) p.get(newItem);
+                        Collection<Object> newCollection = new ArrayList<>(value);
+                        for (Object o : value) newCollection.add(o instanceof Entity ?((Entity)o).clone() : o);
+                        p.set(newItem, newCollection);
+                    }
+                }
+            }
+            return (T) newItem;
+        }
+        catch (InvocationTargetException e) {
+            throw new InternalError("Unreached code", e); // Unreached code
+        }
     }
 
 }

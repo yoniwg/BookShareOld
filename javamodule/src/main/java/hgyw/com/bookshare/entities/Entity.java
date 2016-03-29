@@ -44,37 +44,6 @@ public abstract class Entity implements Cloneable{
         }
     }
 
-    /**
-     * Do deep clone on this entity - clone all nested entities, and all nested collections
-     * contains entities.
-     */
-    public Entity deepClone() {
-        try {
-            Entity newEntity = this.clone();
-            // deep cloning
-            for (Property p : PropertiesReflection.getPropertiesMap(getClass()).values()) {
-                if (p.canWrite()) {
-                    // Clone entity references in this item
-                    if (Entity.class.isAssignableFrom(p.getPropertyClass())) {
-                        Entity value = (Entity) p.get(newEntity);
-                        if (value != null) value = value.clone();
-                        p.set(newEntity, value);
-                    }
-                    // Clone entity references in list in this item
-                    else if (Collection.class.isAssignableFrom(p.getPropertyClass())) {
-                        Collection<?> value = (Collection) p.get(newEntity);
-                        Collection<Object> newCollection = new ArrayList<>(value);
-                        for (Object o : value) newCollection.add(o instanceof Entity ?((Entity)o).clone() : o);
-                        p.set(newEntity, newCollection);
-                    }
-                }
-            }
-            return newEntity;
-        }
-        catch (InvocationTargetException e) {
-            throw new InternalError("Unreached code", e); // Unreached code
-        }
-    }
 
     /**
      * Returns true if and only id the object o is of the same class of this, and the id's are equals.
@@ -110,7 +79,7 @@ public abstract class Entity implements Cloneable{
             for (Map.Entry<String, Property> e : map.entrySet()) {
                 Object value = e.getValue().get(this);
                 if (value instanceof String) value = "'" +  value +"'";
-                if (value instanceof Entity) value = "(id=" +  ((Entity) value).getId() +")";
+                if (value instanceof Entity) value = "(" + ((Entity) value).shortDescription() +")";
                 if (str.length() != 0) str.append(", ");
                 str.append(e.getKey()).append("=").append(value);
             }
@@ -119,6 +88,10 @@ public abstract class Entity implements Cloneable{
             return this.getClass().getSimpleName() + "{Error in reflect this object.}";
         }
 
+    }
+
+    protected String shortDescription() {
+        return "id=" + getId();
     }
 
     public boolean isDeleted() {
