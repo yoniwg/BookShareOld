@@ -1,16 +1,16 @@
 package hgyw.com.bookshare.entities;
 
-import com.annimon.stream.function.Predicate;
-
 import java.math.BigDecimal;
-
-import hgyw.com.bookshare.Auxiliaries.Auxiliaries;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Yoni on 3/15/2016.
  */
-public class BookQuery implements Predicate<BookSupplier>{
+public class BookQuery{
 
+    public enum SortByProperty{TITLE, AUTHOR, PRICE, POPULARITY}
 
     private String titleQuery = "";
 
@@ -20,6 +20,8 @@ public class BookQuery implements Predicate<BookSupplier>{
 
     private BigDecimal beginPrice = null;
     private BigDecimal endPrice = null;
+
+    private List<SortByProperty> sortByPropertyList = new LinkedList<>();
 
     public String getTitleQuery() {
         return titleQuery;
@@ -58,14 +60,11 @@ public class BookQuery implements Predicate<BookSupplier>{
         endPrice = end;
     }
 
+    public List<SortByProperty> getSortByPropertyList() {
+        return sortByPropertyList;
+    }
 
-    @Override
-    public boolean test(BookSupplier bookSupplier) {
-        Book book = bookSupplier.getBook();
-        BigDecimal price = bookSupplier.getPrice();
-        return book.getTitle().toLowerCase().contains(getTitleQuery().toLowerCase())
-                && book.getAuthor().toLowerCase().contains(getAuthorQuery().toLowerCase())
-                && (genreQuery == null || book.getGenre() == genreQuery)
-                && Auxiliaries.isBetween(price, beginPrice, endPrice);
+    public void addPrioritySortStack(SortByProperty sortByProperty) {
+        sortByPropertyList.add(sortByProperty);
     }
 }
