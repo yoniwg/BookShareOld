@@ -109,16 +109,20 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
 
 
     @Override
-    public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity ... referredItem) {
+    public <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity ... referredItems) {
+        for (Entity e : referredItems) {
+            retrieveEntity(e); // Throw exceptions if not found
+        }
         return streamAllNonDeleted(referringClass)
                 .filter(e -> {
                     for (Method method : e.getClass().getMethods()) {
                         if (method.getName().startsWith("get")) {
-                            for (Entity refItem : referredItem) {
+                            for (Entity refItem : referredItems) {
                                 if (method.getReturnType() == refItem.getClass()) {
                                     try {
                                         if (!method.invoke(e).equals(refItem)) return false;
                                     } catch (IllegalAccessException | InvocationTargetException e1) {
+                                        // do nothing
                                     }
                                 }
                             }

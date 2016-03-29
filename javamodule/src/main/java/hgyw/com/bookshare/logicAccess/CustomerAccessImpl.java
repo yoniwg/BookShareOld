@@ -101,7 +101,7 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
         requireItsMeForAccess(order.getTransaction().getCustomer());
         if (!(order.getOrderStatus() == OrderStatus.NEW
                 || order.getOrderStatus() == OrderStatus.WAITING_FOR_PAYING)){
-            throw new IllegalStateException("Status must be " + OrderStatus.NEW + " or " + OrderStatus.WAITING_FOR_PAYING + ".");
+            throw new IllegalStateException("tc cancel the status must be " + OrderStatus.NEW + " or " + OrderStatus.WAITING_FOR_PAYING + ".");
         }
         order.setOrderStatus(OrderStatus.WAITING_FOR_CANCEL);
         dataAccess.updateEntity(order);
@@ -119,7 +119,7 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
     public void addBookReview(BookReview bookReview) {
         bookReview.setId(0);
         bookReview.setCustomer(currentUser);
-        if (dataAccess.findEntityReferTo(BookReview.class, currentUser).size() > 0) {
+        if (dataAccess.findEntityReferTo(BookReview.class, currentUser, bookReview.getBook()).size() > 0) {
             throw new IllegalStateException("The user already has review on this book!");
         }
         dataAccess.createEntity(bookReview);

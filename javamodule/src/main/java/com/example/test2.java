@@ -19,6 +19,8 @@ import hgyw.com.bookshare.entities.Credentials;
 import hgyw.com.bookshare.entities.Customer;
 import hgyw.com.bookshare.entities.Entity;
 import hgyw.com.bookshare.entities.Order;
+import hgyw.com.bookshare.entities.OrderRating;
+import hgyw.com.bookshare.entities.Rating;
 import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.Transaction;
 import hgyw.com.bookshare.exceptions.OrdersTransactionException;
@@ -222,7 +224,7 @@ public class test2 {
         bookQuery.setAuthorQuery("Rowling");
         bookQuery.setPriceBounds(BigDecimal.valueOf(105), BigDecimal.valueOf(145));
         Collection<BookSupplier> booksForOrder = ca.findBooks(bookQuery);
-        List<Order> orders = Stream.of(booksForOrder).map(bs -> {
+        Collection<Order> orders = Stream.of(booksForOrder).map(bs -> {
             Order order = new Order();
             order.setBookSupplier(bs);
             order.computePriceByBookSupplier();
@@ -236,9 +238,33 @@ public class test2 {
             e.printStackTrace();
         }
 
+        //
         System.out.println(" *** findSpecialOffers:");
         ca.findSpecialOffers(100).forEach(System.out::println);
 
+        // cancel order
+        orders = ca.retrieveActiveOrders();
+        ca.cancelOrder(orders.iterator().next().getId());
+        try {
+            System.out.println("$$$Negative test: ");
+            ca.cancelOrder(orders.iterator().next().getId());
+        } catch (Exception e) {
+            System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+
+        // order rating
+        OrderRating orderRating = new OrderRating();
+        orderRating.setCommunication(Rating.GOOD);
+        orderRating.setItemAsDescribed(Rating.BAD);
+        ca.updateOrderRating(orders.stream().skip(1).findFirst().get().getId(), orderRating);
+
+        // book review
+        BookReview bookReview = new BookReview();
+        bookReview.setTitle("ספר דפןק");
+        bookReview.setDescription("The book is very very boring, and is not interesting at all.");
+        ca.addBookReview(bookReview);
+        bookReview.setRating(Rating.POOR);
+        ca.updateBookReview(bookReview);
 
         //////////////////////////////
         accessManager.signOut();

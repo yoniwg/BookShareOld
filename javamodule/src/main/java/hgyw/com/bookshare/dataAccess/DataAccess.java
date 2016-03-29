@@ -71,12 +71,13 @@ public interface DataAccess extends Crud {
 
 
     /**
-     * Find list of all items of referringClass that refer to referredItem.
+     * Find list of all items of referringClass that refer to referredItems.
      * @param <T>
      * @param referringClass Referring class
-     * @param referredItem Item that referred by items.
+     * @param referredItems Item that referred by items.
      * @return Collection of referring items.
+     * @throws java.util.NoSuchElementException if reffered items are not found.
      */
-    <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity ... referredItem);
+    <T extends Entity> Collection<T> findEntityReferTo(Class<? extends T> referringClass, Entity ... referredItems);
 
 }
