@@ -58,22 +58,6 @@ class ListsCrudImpl implements Crud {
         assignAndSetReferencesByDatabase(retrievedItem, item);
     }
 
-    private void assignAndSetReferencesByDatabase(Entity target, Entity source) {
-        for (Property p : PropertiesReflection.getPropertiesMap(target.getClass()).values()) {
-            if (!p.canWrite()) continue;
-            try {
-                Object value = p.get(source);
-                if (value instanceof Entity) {
-                    Entity nestedEntity = (Entity) value;
-                    value = retrieveOriginalEntity(nestedEntity.getClass(), nestedEntity.getId());
-                }
-                p.set(target, value);
-            } catch (InvocationTargetException e) {
-                // do nothing - unreached code
-            }
-        }
-    }
-
     @Override
     public void deleteEntity(Entity item) {
         Entity retrievedItem = retrieveNonDeletedOriginalEntity(item);
@@ -115,6 +99,22 @@ class ListsCrudImpl implements Crud {
 
     private static NoSuchElementException createNoSuchEntityException(Class<?> entityClass, long id) {
         return new NoSuchElementException("No entity " + entityClass.getSimpleName() + " with ID " + id);
+    }
+
+    private void assignAndSetReferencesByDatabase(Entity target, Entity source) {
+        for (Property p : PropertiesReflection.getPropertiesMap(target.getClass()).values()) {
+            if (!p.canWrite()) continue;
+            try {
+                Object value = p.get(source);
+                if (value instanceof Entity) {
+                    Entity nestedEntity = (Entity) value;
+                    value = retrieveOriginalEntity(nestedEntity.getClass(), nestedEntity.getId());
+                }
+                p.set(target, value);
+            } catch (InvocationTargetException e) {
+                // do nothing - unreached code
+            }
+        }
     }
 
     public Entity deepCloneByDatabase(Entity entity) {

@@ -162,7 +162,6 @@ public class javaProgram {
         for (int i = 0; i < 10; i++ ) {
             Order order = new Order();
             order.setBookSupplier(getRandomItem(BookSupplier.class));
-            order.computePriceByBookSupplier();
             orderList.add(order);
         }
         try {
