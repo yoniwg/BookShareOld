@@ -7,6 +7,7 @@ import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
+import hgyw.com.bookshare.entities.Supplier;
 import hgyw.com.bookshare.entities.User;
 
 /**
@@ -46,6 +47,11 @@ class GeneralAccessImpl implements GeneralAccess {
     @Override
     public Collection<BookSupplier> retrieveSuppliers(Book book) {
         return dataAccess.findEntityReferTo(BookSupplier.class, book);
+    }
+
+    @Override
+    public Collection<BookSupplier> retrieveBooksOfSuppliers(Supplier supplier) {
+        return dataAccess.findEntityReferTo(BookSupplier.class, supplier);
     }
 
     public <T extends User> T retrieveUserDetails(T currentUser) {

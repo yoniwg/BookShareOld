@@ -25,7 +25,7 @@ import hgyw.com.bookshare.entities.User;
 /**
  * Created by haim7 on 24/03/2016.
  */
-class CrudTest {
+class ListsCrudImplTest {
 /*
     private final ListsCrudImpl crud;
 

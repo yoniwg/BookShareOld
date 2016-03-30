@@ -43,5 +43,13 @@ public interface GeneralAccess {
      */
     Collection<BookSupplier> retrieveSuppliers(Book book);
 
+    /**
+     * Retrieve Books of Suppliers.
+     * @param supplier the supplier
+     * @return Collection of BookSuppliers.
+     * @throws java.util.NoSuchElementException if the supplier is not found in database
+     */
+    Collection<BookSupplier> retrieveBooksOfSuppliers(Supplier supplier);
+
 
 }

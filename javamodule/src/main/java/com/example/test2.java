@@ -98,8 +98,6 @@ public class test2 {
             System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
-
-
         //////////////////////////////
         accessManager.signOut();
         //////////////////////////////
@@ -280,6 +278,9 @@ public class test2 {
             System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
+        System.out.println(" ** suppliers of book " + book.shortDescription() + ": ");
+        ca.retrieveSuppliers(book).forEach(System.out::println);
+
         //////////////////////////////
         accessManager.signOut();
         //////////////////////////////
@@ -290,12 +291,13 @@ public class test2 {
         customer.setEmail("yoni@gmail.com");
         customer.setFirstName("Yoni");
         customer.setLastName("Wiesberg");
+        System.out.println(" ** username haim1: " + accessManager.isUserNameTaken("haim1"));
+        System.out.println(" ** username yoni1: " + accessManager.isUserNameTaken("yoni1"));
         try {
             accessManager.signUp(customer);
         } catch (WrongLoginException e) {
             e.printStackTrace();
         }
-
 
         ///////////////////////////////////////////////////
         printWholeDatabase(DataAccessFactory.getInstance());

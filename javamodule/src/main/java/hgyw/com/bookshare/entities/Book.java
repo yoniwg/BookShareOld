@@ -1,5 +1,7 @@
 package hgyw.com.bookshare.entities;
 
+import java.util.Comparator;
+
 /**
  * Created by Yoni on 3/15/2016.
  */
@@ -56,7 +58,7 @@ public class Book extends Entity {
     }
 
     @Override
-    protected String shortDescription() {
+    public String shortDescription() {
         return super.shortDescription() + " '" + getTitle() + "'";
     }
 }

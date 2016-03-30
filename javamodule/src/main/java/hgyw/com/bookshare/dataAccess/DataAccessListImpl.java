@@ -5,8 +5,6 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
@@ -32,7 +30,7 @@ import hgyw.com.bookshare.entities.reflection.PropertiesReflection;
 /**
  * Created by haim7 on 23/03/2016.
  */
-class DataAccessImpl extends ListsCrudImpl implements DataAccess {
+class DataAccessListImpl extends ListsCrudImpl implements DataAccess {
 
     @Override
     public Optional<User> retrieveUserWithCredentials(Credentials credentials) {
@@ -114,25 +112,19 @@ class DataAccessImpl extends ListsCrudImpl implements DataAccess {
         for (Entity e : referredItems) {
             retrieveEntity(e); // Throw exceptions if not found
         }
+        Collection<Property> propertiesOfEntity = Stream.of(PropertiesReflection.getPropertiesMap(referringClass).values())
+                .filter(p -> Entity.class.isAssignableFrom(p.getPropertyClass()))
+                .collect(Collectors.toList());
         return streamAllNonDeleted(referringClass)
                 .filter(e -> {
-                    for (Method method : e.getClass().getMethods()) {
-                        if (method.getName().startsWith("get")) {
-                            for (Entity refItem : referredItems) {
-                                if (method.getReturnType() == refItem.getClass()) {
-                                    try {
-                                        if (!method.invoke(e).equals(refItem)) return false;
-                                    } catch (IllegalAccessException | InvocationTargetException e1) {
-                                        // do nothing
-                                    }
-                                }
-                            }
+                    for (Property p : propertiesOfEntity)
+                        for (Entity refItem : referredItems) {
+                            if (p.getPropertyClass() == refItem.getClass() && !p.get(e).equals(refItem))
+                                return false;
                         }
-                    }
                     return true;
                 })
                 .collect(Collectors.toList());
-
     }
 
     public <T extends Entity> Stream<T> streamAllNonDeleted(Class<? extends T> entityType) {

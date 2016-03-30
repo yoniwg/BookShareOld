@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -45,7 +46,12 @@ public class PropertiesReflection {
         }
     }
 
+    /**
+     * Creates of all properties of class clazz, where key is the property name.
+     * @param clazz
+     */
     public static Map<String, Property> getPropertiesMap(Class<?> clazz) {
+
         Map<String, Property> map = new HashMap<>();
         for (Method m : clazz.getMethods()) {
             String getterNameWithoutPrefix = removePrefixFromGetter(m);
@@ -57,13 +63,6 @@ public class PropertiesReflection {
             }
         }
         return map;
-    }
-
-    public static <T extends Entity> Property getPropertyOfType(Class<? extends T> clazz, Class<? extends Entity> propertyType) {
-        for (Property p : getPropertiesMap(clazz).values())
-            if (p.getPropertyClass() == propertyType)
-                return p;
-        throw new NoSuchElementException("No property of type " + propertyType.getSimpleName() + " reflected in class " + clazz.getSimpleName());
     }
 
     /**

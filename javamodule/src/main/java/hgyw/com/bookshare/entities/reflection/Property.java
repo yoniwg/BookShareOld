@@ -3,10 +3,10 @@ package hgyw.com.bookshare.entities.reflection;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Created by haim7 on 23/03/2016.
+ * Interface for property
  */
 public interface Property {
-    // throws IllegalArgumentException, UnsupportedOperationException
+    // throws IllegalArgumentException, UnsupportedOperationException if read-only
     void set(Object o, Object value);
     // throws IllegalArgumentException
     Object get(Object o);

@@ -53,7 +53,7 @@ interface Crud {
     <T extends Entity> T retrieveEntity(T item);
 
     /**
-     * Stream all items of specific entity.
+     * Stream all items of specified entity.
      * @param <T> The type of entity
      * @return Stream of all entities.
      */

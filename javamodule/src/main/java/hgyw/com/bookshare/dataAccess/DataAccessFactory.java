@@ -20,7 +20,7 @@ public class DataAccessFactory {
         if (crud == null) {
             switch (currentDB) {
                 case LISTS:
-                    crud = new DataAccessImpl();
+                    crud = new DataAccessListImpl();
                    // new CrudTest((ListsCrudImpl) crud); // test.
                     break;
                 case SQL_LITE:

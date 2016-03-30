@@ -1,8 +1,5 @@
 package hgyw.com.bookshare.entities;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 
 import hgyw.com.bookshare.entities.reflection.Property;
@@ -86,7 +83,7 @@ public abstract class Entity implements Cloneable{
         return getClass().getSimpleName() + "(id=" + idProperty.get(this) + "){" + str + "}";
     }
 
-    protected String shortDescription() {
+    public String shortDescription() {
         return "id=" + getId();
     }
 
