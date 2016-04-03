@@ -7,6 +7,7 @@ import java.math.RoundingMode;
  * Created by Yoni on 3/15/2016.
  */
 public class BookSupplier extends Entity {
+
     private Supplier supplier;
     private Book book;
     private BigDecimal price = BigDecimal.ZERO;
