@@ -15,6 +15,7 @@ import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderRating;
 import hgyw.com.bookshare.entities.OrderStatus;
 import hgyw.com.bookshare.entities.Transaction;
+import hgyw.com.bookshare.entities.User;
 import hgyw.com.bookshare.exceptions.OrdersTransactionException;
 
 /**
@@ -128,7 +129,8 @@ class CustomerAccessImpl extends GeneralAccessImpl implements CustomerAccess {
 
     @Override
     public void updateBookReview(BookReview bookReview) {
-        requireItsMeForAccess(dataAccess.retrieveEntity(bookReview).getCustomer());
+        BookReview originalBookReview = dataAccess.retrieveEntity(bookReview);
+        requireItsMeForAccess(originalBookReview.getCustomer());
         dataAccess.updateEntity(bookReview);
     }
 

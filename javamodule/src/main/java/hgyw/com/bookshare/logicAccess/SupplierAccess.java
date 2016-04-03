@@ -1,5 +1,6 @@
 package hgyw.com.bookshare.logicAccess;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
@@ -83,10 +84,10 @@ public interface SupplierAccess extends GeneralAccess {
     /**
      * update exists BookSupplier.
      * @param bookSupplier the BookSupplier
-     * @throws IllegalArgumentException if this BookSupplier is not belong to current user
+     * @throws IllegalArgumentException if this BookSupplier is not belong to current user.
      * @throws java.util.NoSuchElementException if BookSupplier is not found.
      */
-    void updateBookSupplier(BookSupplier bookSupplier);
+    void updateBookSupplier(BookSupplier bookSupplier);  // TODO: Problem with changing the referenced entity
 
     /**
      * remove a BookSupplier

@@ -100,10 +100,10 @@ public interface CustomerAccess extends GeneralAccess {
     /**
      * update exists review.
      * @param bookReview the book review
-     * @throws IllegalArgumentException if this review is not belong to current user
+     * @throws IllegalArgumentException if this review is not belong to current user.
      * @throws java.util.NoSuchElementException if review is not found.
      */
-    void updateBookReview(BookReview bookReview);
+    void updateBookReview(BookReview bookReview); // TODO: Problem with changing the referenced entity
 
     /**
      * remove a book review

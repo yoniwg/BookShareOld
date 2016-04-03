@@ -1,11 +1,11 @@
 package hgyw.com.bookshare.logicAccess;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
 import hgyw.com.bookshare.dataAccess.DataAccess;
 import hgyw.com.bookshare.entities.Book;
-import hgyw.com.bookshare.entities.BookReview;
 import hgyw.com.bookshare.entities.BookSupplier;
 import hgyw.com.bookshare.entities.Order;
 import hgyw.com.bookshare.entities.OrderStatus;
@@ -88,7 +88,8 @@ public class SupplierAccessImpl extends GeneralAccessImpl implements SupplierAcc
 
     @Override
     public void updateBookSupplier(BookSupplier bookSupplier) {
-        requireItsMeForAccess(dataAccess.retrieveEntity(bookSupplier).getSupplier());
+        BookSupplier originalBookSupplier = dataAccess.retrieveEntity(bookSupplier);
+        requireItsMeForAccess(originalBookSupplier.getSupplier());
         dataAccess.updateEntity(bookSupplier);
     }
 
