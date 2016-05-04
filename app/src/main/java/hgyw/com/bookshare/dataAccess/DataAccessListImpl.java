@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import hgyw.com.bookshare.auxiliaries.Auxiliaries;
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
 import hgyw.com.bookshare.entities.BookSupplier;
@@ -62,7 +61,7 @@ class DataAccessListImpl extends ListsCrudImpl implements DataAccess {
         return streamAllNonDeleted(Order.class)
                 .filter(o -> (customer == null || retrieve(Transaction.class, o.getTransactionId()).getCustomerId() == customer.getId())
                                 && (supplier == null || o.getBookSupplierId() == supplier.getId())
-                                && Auxiliaries.isBetween(retrieve(Transaction.class, o.getTransactionId()).getDate(), fromDate, toDate)
+                                && isBetween(retrieve(Transaction.class, o.getTransactionId()).getDate(), fromDate, toDate)
                                 && (!onlyOpen || o.getOrderStatus().isActive())
                 ).collect(Collectors.toList());
     }
@@ -124,6 +123,12 @@ class DataAccessListImpl extends ListsCrudImpl implements DataAccess {
         return book.getTitle().toLowerCase().contains(bookQuery.getTitleQuery().toLowerCase())
                 && book.getAuthor().toLowerCase().contains(bookQuery.getAuthorQuery().toLowerCase())
                 && (bookQuery.getGenreQuery() == null || book.getGenre() == bookQuery.getGenreQuery())
-                && Auxiliaries.isBetween(price, bookQuery.getBeginPrice(), bookQuery.getEndPrice());
+                && isBetween(price, bookQuery.getBeginPrice(), bookQuery.getEndPrice());
     }
+
+    private static <T extends Comparable<T>> boolean isBetween(T value, T fromValue, T toValue) {
+        return (fromValue==null || value.compareTo(fromValue) >= 0)
+                && (toValue==null || value.compareTo(toValue) < 0);
+    }
+
 }
