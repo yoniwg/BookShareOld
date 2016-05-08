@@ -1,9 +1,11 @@
 package hgyw.com.bookshare.dataAccess;
 
 import com.annimon.stream.Optional;
+import com.annimon.stream.function.Function;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
@@ -60,7 +62,7 @@ public interface DataAccess extends Crud {
      * @param query The Query
      * @return Collections of BookSupplier's. (the query could be depended on the supplier to.)
      */
-    Collection<BookSupplier> findBooks(BookQuery query);
+    List<Book> findBooks(BookQuery query);
 
     /**
      * Find special offers to specified user.
@@ -68,7 +70,7 @@ public interface DataAccess extends Crud {
      * @param limit
      * @return Collection of BookSupplier's.
      */
-    Collection<BookSupplier> findSpecialOffers(User user, int limit);
+    List<Book> findSpecialOffers(User user, int limit);
 
 
     /**
@@ -80,5 +82,4 @@ public interface DataAccess extends Crud {
      * @throws java.util.NoSuchElementException if reffered items are not found.
      */
     <T extends Entity> Collection<T> findEntityReferTo(Class<T> referringClass, IdReference... referredItems);
-
 }

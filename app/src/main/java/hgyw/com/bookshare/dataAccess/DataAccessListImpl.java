@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import hgyw.com.bookshare.entities.Book;
@@ -51,8 +52,8 @@ class DataAccessListImpl extends ListsCrudImpl implements DataAccess {
     public Collection<Customer> findInterestedInBook(Book book, User userAsked) {
         return streamAllNonDeleted(Order.class)
                 .filter(o -> retrieve(BookSupplier.class, o.getBookSupplierId()).getBookId() == book.getId())
-                .map(o -> retrieve(Transaction.class, o.getTransactionId()))
-                .map(t -> retrieve(Customer.class, t.getCustomerId()))
+                .map(retriever(Transaction.class, Order::getTransactionId))
+                .map(retriever(Customer.class, Transaction::getCustomerId))
                 .collect(Collectors.toList());
     }
 
@@ -67,22 +68,30 @@ class DataAccessListImpl extends ListsCrudImpl implements DataAccess {
     }
 
     @Override
-    public List<BookSupplier> findBooks(BookQuery query) {
-        return streamAllNonDeleted(BookSupplier.class).filter(bs -> performFilterQuery(bs, query)).collect(Collectors.toList());
+    public List<Book> findBooks(BookQuery query) {
+        return streamAllNonDeleted(Book.class)
+                .filter(book -> performFilterQuery(book, query))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookSupplier> findSpecialOffers(User user, int limit) {
-        List<String> topAuthors = getTopInstances(getDistinctBooksOfUser(user).map(bs -> retrieve(Book.class, bs.getBookId()).getAuthor()), limit);
-        List<Book.Genre> topGenre = getTopInstances(getDistinctBooksOfUser(user).map(bs -> retrieve(Book.class, bs.getBookId()).getGenre()), limit);
+    public List<Book> findSpecialOffers(User user, int limit) {
+        List<String> topAuthors = getTopInstances(getDistinctBooksOfUser(user)
+                .map(retriever(Book.class, BookSupplier::getBookId))
+                .map(Book::getAuthor), limit
+        );
+        List<Book.Genre> topGenre = getTopInstances(getDistinctBooksOfUser(user)
+                .map(retriever(Book.class, BookSupplier::getBookId))
+                .map(Book::getGenre), limit
+        );
         //find books from top authors and genres
         // give high priority to author & genre fitness
         Function<Book, Integer> rateValueOfBook = book -> -(
                 (topAuthors.contains(book.getAuthor()) ? 1 : 0)
-                        + (topGenre.contains(book.getGenre()) ? 1 : 0)
+                + (topGenre.contains(book.getGenre()) ? 1 : 0)
         );
-        return streamAllNonDeleted(BookSupplier.class)
-                .sortBy(bs -> rateValueOfBook.apply(retrieve(Book.class, bs.getBookId())))
+        return streamAllNonDeleted(Book.class)
+                .sortBy(rateValueOfBook)
                 .limit(limit)
                 .collect(Collectors.toList());
     }
@@ -90,7 +99,7 @@ class DataAccessListImpl extends ListsCrudImpl implements DataAccess {
     private Stream<BookSupplier> getDistinctBooksOfUser(User currentUser) {
         return streamAllNonDeleted(Order.class)
                 .filter(o -> retrieve(Transaction.class, o.getTransactionId()).getCustomerId() == currentUser.getId())
-                .map(o -> retrieve(BookSupplier.class, o.getBookSupplierId()))
+                .map(retriever(BookSupplier.class, Order::getBookSupplierId))
                 .distinct();
     }
 
@@ -117,9 +126,13 @@ class DataAccessListImpl extends ListsCrudImpl implements DataAccess {
         return super.streamAll(entityType).filter(e -> !e.isDeleted());
     }
 
-    private boolean performFilterQuery(BookSupplier bookSupplier, BookQuery bookQuery) {
-        Book book = retrieve(Book.class, bookSupplier.getBookId());
-        BigDecimal price = bookSupplier.getPrice();
+    private boolean performFilterQuery(Book book, BookQuery bookQuery) {
+        BigDecimal price = streamAllNonDeleted(BookSupplier.class)
+                .filter(bs -> bs.getBookId() == book.getId())
+                .map(BookSupplier::getPrice)
+                .max(BigDecimal::compareTo)
+                .orElse(null);
+        if (price == null) return false;
         return book.getTitle().toLowerCase().contains(bookQuery.getTitleQuery().toLowerCase())
                 && book.getAuthor().toLowerCase().contains(bookQuery.getAuthorQuery().toLowerCase())
                 && (bookQuery.getGenreQuery() == null || book.getGenre() == bookQuery.getGenreQuery())
@@ -130,5 +143,4 @@ class DataAccessListImpl extends ListsCrudImpl implements DataAccess {
         return (fromValue==null || value.compareTo(fromValue) >= 0)
                 && (toValue==null || value.compareTo(toValue) < 0);
     }
-
 }

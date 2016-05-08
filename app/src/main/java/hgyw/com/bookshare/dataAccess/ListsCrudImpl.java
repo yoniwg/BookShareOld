@@ -1,6 +1,7 @@
 package hgyw.com.bookshare.dataAccess;
 
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Function;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,6 +100,11 @@ class ListsCrudImpl implements Crud {
 
     private static NoSuchElementException createNoSuchEntityException(Class<?> entityClass, long id) {
         return new NoSuchElementException("No entity " + entityClass.getSimpleName() + " with ID " + id);
+    }
+
+    @Override
+    public <T extends Entity, R extends Entity> Function<T, R> retriever(Class<R> referredClass, Function<T, Long> referenceFunction) {
+        return t -> retrieve(referredClass, referenceFunction.apply(t));
     }
 
 }

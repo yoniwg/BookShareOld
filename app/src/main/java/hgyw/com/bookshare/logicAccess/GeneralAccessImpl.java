@@ -1,6 +1,11 @@
 package hgyw.com.bookshare.logicAccess;
 
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
+
+import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 import hgyw.com.bookshare.dataAccess.DataAccess;
 import hgyw.com.bookshare.entities.Book;
@@ -32,12 +37,26 @@ class GeneralAccessImpl implements GeneralAccess {
     }
 
     @Override
-    public Collection<BookSupplier> findBooks(BookQuery query) {
+    public List<Book> findBooks(BookQuery query) {
         return dataAccess.findBooks(query);
     }
 
     @Override
-    public Collection<BookSupplier> findSpecialOffers(int limit) {
+    public BigDecimal[] findBookPricesRange(Book book) {
+        Collection<BigDecimal> prices = Stream.of(retrieveSuppliers(book))
+                .map(BookSupplier::getPrice)
+                .collect(Collectors.toList());
+        if (prices.size() == 0) {
+            return new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO};
+        }
+        return new BigDecimal[] {
+                Stream.of(prices).min(BigDecimal::compareTo).get(),
+                Stream.of(prices).max(BigDecimal::compareTo).get()
+        };
+    }
+
+    @Override
+    public List<Book> findSpecialOffers(int limit) {
         return dataAccess.findSpecialOffers(currentUser, limit);
     }
 

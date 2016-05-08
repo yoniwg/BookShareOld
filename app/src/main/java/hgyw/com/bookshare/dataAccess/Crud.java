@@ -1,6 +1,8 @@
 package hgyw.com.bookshare.dataAccess;
 
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.Predicate;
 
 import java.util.Collection;
 
@@ -58,4 +60,11 @@ interface Crud {
      * @return Stream of all entities.
      */
     <T extends Entity> Stream<T> streamAll(Class<? extends T> entityType);
+
+    abstract class RetrieverFunction<T extends Entity,R extends Entity> implements Function<T,R>{
+        Predicate<T> checkId(long id) {
+            return t -> apply(t).getId() == id;
+        }
+    }
+    <T extends Entity, R extends Entity> Function<T, R> retriever(Class<R> referredClass, Function<T, Long> referenceFunction);
 }

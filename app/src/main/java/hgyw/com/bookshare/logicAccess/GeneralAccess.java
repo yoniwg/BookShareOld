@@ -1,6 +1,8 @@
 package hgyw.com.bookshare.logicAccess;
 
+import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 import hgyw.com.bookshare.entities.Book;
 import hgyw.com.bookshare.entities.BookQuery;
@@ -20,14 +22,21 @@ public interface GeneralAccess {
      * @param query The query
      * @return collections of BookSuppliers math the quary.
      */
-    Collection<BookSupplier> findBooks(BookQuery query);
+    List<Book> findBooks(BookQuery query);
+
+    /**
+     * TODO documentation
+     * @param book
+     * @return
+     */
+    BigDecimal[] findBookPricesRange(Book book);
 
     /**
      * Find special offers for current user.
      * @param limit number of the offers are requested.
      * @return Collection of BookSuppliers.
      */
-    Collection<BookSupplier> findSpecialOffers(int limit);
+    List<Book> findSpecialOffers(int limit);
 
     /**
      *

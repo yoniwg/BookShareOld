@@ -55,9 +55,12 @@ public class BookQuery{
         return endPrice;
     }
 
-    public void setPriceBounds(BigDecimal begin, BigDecimal end){
-        beginPrice = begin;
-        endPrice = end;
+    public void setBeginPrice(BigDecimal beginPrice) {
+        this.beginPrice = beginPrice;
+    }
+
+    public void setEndPrice(BigDecimal endPrice) {
+        this.endPrice = endPrice;
     }
 
     public List<SortByProperty> getSortByPropertyList() {
